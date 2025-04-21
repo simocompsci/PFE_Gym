@@ -11,16 +11,15 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('gym_products', function (Blueprint $table) {
+        Schema::create('classes', function (Blueprint $table) {
             $table->id();
             $table->foreignId('gym_id')->constrained()->onDelete('cascade');
             $table->string('name', 100);
             $table->text('description')->nullable();
-            $table->decimal('price', 10, 2);
-            $table->decimal('cost', 10, 2)->nullable()->comment('Purchase cost');
-            $table->integer('stock_quantity')->default(0);
-            $table->string('category', 50)->nullable();
-            $table->string('image_url', 255)->nullable();
+            $table->foreignId('coach_id')->constrained('coaches')->onDelete('cascade');
+            $table->integer('max_capacity')->nullable();
+            $table->integer('duration_minutes');
+            $table->string('color_code', 7)->nullable()->comment('For calendar display');
             $table->boolean('is_active')->default(true);
             $table->timestamps();
         });
@@ -31,6 +30,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('gym_products');
+        Schema::dropIfExists('classes');
     }
 };

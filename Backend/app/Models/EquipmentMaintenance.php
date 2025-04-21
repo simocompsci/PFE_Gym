@@ -13,8 +13,5 @@ class EquipmentMaintenance extends Model
         return $this->belongsTo(Equipment::class);
     }
 
-    // Polymorphic relationship
-    public function performedBy() {
-        return $this->morphTo('performed_by', 'performed_by_type', 'performed_by_id');
-    }
+    
 }

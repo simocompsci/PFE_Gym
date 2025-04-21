@@ -11,14 +11,16 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('class_registrations', function (Blueprint $table) {
+        Schema::create('attendance', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('session_id')->constrained('class_sessions')->onDelete('cascade');
             $table->foreignId('client_id')->constrained()->onDelete('cascade');
-            $table->dateTime('registration_date')->useCurrent();
-            $table->enum('attendance_status', ['registered', 'attended', 'no_show'])->default('registered');
+            $table->foreignId('gym_id')->constrained()->onDelete('cascade');
+            $table->dateTime('check_in_time');
+            $table->dateTime('check_out_time')->nullable();
+            $table->date('date');
+            $table->foreignId('session_id')->nullable()->constrained('class_sessions')->onDelete('set null');
             $table->text('notes')->nullable();
-            $table->unique(['session_id', 'client_id']);
+
         });
     }
 
@@ -27,6 +29,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('class_registrations');
+        Schema::dropIfExists('attendance');
     }
 };

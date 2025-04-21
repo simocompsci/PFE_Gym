@@ -14,7 +14,7 @@ const StatCards = () => {
 			{overviewData.map((item, index) => (
 				<motion.div
 					key={item.name}
-					className='bg-gray-100 bg-opacity-50 border border-gray-200 rounded-xl p-6'
+					className='bg-emerald-200 bg-opacity-50 border border-emerald-300 rounded-xl p-6'
 					initial={{ opacity: 0, y: 20 }}
 					animate={{ opacity: 1, y: 0 }}
 					transition={{ delay: index * 0.1 }}
@@ -28,7 +28,7 @@ const StatCards = () => {
 
 						<div
 							className={`
-              p-3 rounded-full bg-opacity-20 ${item.change >= 0 ? "bg-cyan-500" : "bg-cyan-500"}
+              p-3 rounded-full bg-opacity-20 ${item.change >= 0 ? "bg-white" : "bg-white"}
               `}
 						>
 							<item.icon className={`size-6  ${item.change >= 0 ? "text-cyan-500" : "text-cyan-500"}`} />

@@ -17,8 +17,5 @@ class PaymentTracking extends Model
         return $this->belongsTo(ClientMembership::class);
     }
 
-    // Polymorphic relationship
-    public function recordedBy() {
-        return $this->morphTo('recorded_by', 'recorded_by_type', 'recorded_by_id');
-    }
+    
 }

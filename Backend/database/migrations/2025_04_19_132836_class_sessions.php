@@ -11,16 +11,15 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('client_goals', function (Blueprint $table) {
+        Schema::create('class_sessions', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('client_id')->constrained()->onDelete('cascade');
+            $table->foreignId('class_id')->constrained('classes')->onDelete('cascade');
+            $table->date('session_date');
+            $table->time('start_time');
+            $table->time('end_time');
             $table->foreignId('coach_id')->nullable()->constrained('coaches')->onDelete('set null');
-            $table->string('goal_type', 50)->comment('e.g., weight_loss, strength');
-            $table->string('target_value', 50);
-            $table->string('current_value', 50)->nullable();
-            $table->date('start_date');
-            $table->date('target_date')->nullable();
-            $table->boolean('is_achieved')->default(false);
+            $table->integer('current_attendance')->default(0);
+            $table->enum('status', ['scheduled', 'completed', 'cancelled'])->default('scheduled');
             $table->text('notes')->nullable();
             $table->timestamps();
         });
@@ -31,6 +30,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('client_goals');
+        Schema::dropIfExists('class_sessions');
     }
 };
+

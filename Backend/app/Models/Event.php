@@ -13,8 +13,5 @@ class Event extends Model
         return $this->belongsTo(Gym::class);
     }
 
-    public function organizer()
-    {
-        return $this->morphTo(); // For admin/coach organizers
-    }
+   
 }

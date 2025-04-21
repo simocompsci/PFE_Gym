@@ -38,15 +38,15 @@ return [
     // config/auth.php
     'guards' => [
         'admin' => [
-            'driver' => 'session',
+            'driver' => 'sunctum',
             'provider' => 'admins',
         ],
         'coach' => [
-            'driver' => 'session',
+            'driver' => 'sanctum',
             'provider' => 'coaches',
         ],
         'secretary' => [
-            'driver' => 'session',
+            'driver' => 'sanctum',
             'provider' => 'secretaries',
         ],
     ],

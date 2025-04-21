@@ -17,8 +17,5 @@ class ProductSale extends Model
         return $this->belongsTo(Client::class);
     }
 
-    // Polymorphic relationship
-    public function soldBy() {
-        return $this->morphTo('sold_by', 'sold_by_type', 'sold_by_id');
-    }
+
 }

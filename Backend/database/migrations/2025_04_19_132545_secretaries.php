@@ -11,7 +11,21 @@ return new class extends Migration
      */
     public function up(): void
     {
-        //
+        Schema::create('secretaries', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('gym_id')->constrained()->onDelete('cascade');
+            $table->string('first_name', 50);
+            $table->string('last_name', 50);
+            $table->string('email', 100)->unique();
+            $table->string('phone', 20)->nullable();
+            $table->string('password');
+            $table->string('shift_schedule', 100)->nullable();
+            $table->date('hire_date')->nullable();
+            $table->boolean('is_active')->default(true);
+            $table->dateTime('last_login')->nullable();
+            $table->rememberToken();
+            $table->timestamps();
+        });
     }
 
     /**
@@ -19,6 +33,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        //
+        Schema::dropIfExists('secretaries');
     }
 };

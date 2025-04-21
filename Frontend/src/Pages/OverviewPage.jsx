@@ -17,8 +17,8 @@ const OverviewPage = () => {
         transition={{ duration: 1 }}
       >
         <div className='grid grid-cols-1 lg:grid-cols-2 gap-5'>
-          <MessageCards name='Total Orders' icon={Zap} value='9879' color='#72b7ef' />
-          <MessageCards name='Total Orders' icon={Zap} value='9879' color='#72b7ef' />
+          <MessageCards name='Total Clients' icon={Zap} value='9879' color='#72b7ef' />
+          <MessageCards name='Total Clients' icon={Zap} value='9879' color='#72b7ef' />
         </div>
         <StatCards />
         

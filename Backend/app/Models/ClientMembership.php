@@ -17,8 +17,4 @@ class ClientMembership extends Model
         return $this->belongsTo(MembershipPlan::class, 'membership_plan_id');
     }
 
-    // Polymorphic relationship
-    public function creator() {
-        return $this->morphTo('creator', 'creator_type', 'creator_id');
-    }
 }

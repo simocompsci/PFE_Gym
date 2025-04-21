@@ -1,38 +1,75 @@
-import { BrowserRouter , Route , Routes  } from 'react-router-dom';
-import Sidebar from './components/common/Sidebar';
-import StatCards from './components/common/StatCards';
+// src/App.jsx
+import { BrowserRouter, Routes, Route, Navigate, Outlet } from 'react-router-dom';
+import { AuthProvider } from './lib/AuthContext';
+import { ProtectedRoute } from './components/ProtectedRoute';
+import AuthLayout from './components/layouts/AuthLayout';
+import LoginPage from './Pages/LoginPage';
 import OverviewPage from './Pages/OverviewPage';
 import StaffPage from './Pages/StaffPage';
 import ClientsPage from './Pages/ClientsPage';
 import ProductsPage from './Pages/ProductsPage';
 import ClassesPage from './Pages/ClassesPage';
 import AnalyticsPage from './Pages/AnalyticsPage';
-import './index.css'
-import LoginPage from './Pages/LoginPage';
-
+import './index.css';
 
 function App() {
-
   return (
-    <div className='flex h-screen bg-gray-300 text-gray-800 overflow-hidden'>
-      {/* BG */}
-      <div className='fixed inset-0 z-0'>
-        <div className='absolute bg-white' />
-        <div className='absolute inset-0' />
-      </div>
-    <BrowserRouter>
-    <Sidebar />
-      <Routes>
-        <Route path='/' element={<OverviewPage />} />
-        <Route path='/staff' element={<StaffPage />} />
-        <Route path='/clients' element={<ClientsPage />} />
-        <Route path='/products' element={<ProductsPage />} />
-        <Route path='/classes' element={<ClassesPage />} />
-        <Route path='/analytics' element={<AnalyticsPage />} />
-      </Routes>
-    </BrowserRouter>
-      
-    </div>
-  )
+    <AuthProvider>
+      <BrowserRouter>
+        <Routes>
+          {/* Public route */}
+          <Route path="/login" element={<LoginPage />} />
+          
+          {/* Protected routes with AuthLayout (includes sidebar) */}
+          <Route element={<ProtectedRoute allowedRoles={['admin', 'coach', 'secretary']} />}>
+            <Route element={<AuthLayout />}>
+                {/* Admin routes */}
+                <Route path="/admin/dashboard" element={<ProtectedRoute allowedRoles={['admin']} />}>
+                  <Route index element={<OverviewPage />} />
+                </Route>
+                
+                {/* Coach routes */}
+                <Route path="/coach/dashboard" element={<ProtectedRoute allowedRoles={['coach']} />}>
+                  <Route index element={<OverviewPage />} />
+                </Route>
+                
+                {/* Secretary routes */}
+                <Route path="/secretary/dashboard" element={<ProtectedRoute allowedRoles={['secretary']} />}>
+                  <Route index element={<OverviewPage />} />
+                </Route>
+                
+                {/* Shared routes with role-based access */}
+                <Route path="/staff" element={<ProtectedRoute allowedRoles={['admin']} />}>
+                  <Route index element={<StaffPage />} />
+                </Route>
+                
+                <Route path="/clients" element={<ProtectedRoute allowedRoles={['admin', 'secretary']} />}>
+                  <Route index element={<ClientsPage />} />
+                </Route>
+                
+                <Route path="/products" element={<ProtectedRoute allowedRoles={['admin', 'secretary']} />}>
+                  <Route index element={<ProductsPage />} />
+                </Route>
+                
+                <Route path="/classes" element={<ProtectedRoute allowedRoles={['admin', 'coach']} />}>
+                  <Route index element={<ClassesPage />} />
+                </Route>
+                
+                <Route path="/analytics" element={<ProtectedRoute allowedRoles={['admin']} />}>
+                  <Route index element={<AnalyticsPage />} />
+                </Route>
+            </Route>
+          </Route>
+          
+          {/* Redirect root to login or appropriate dashboard */}
+          <Route path="/" element={<Navigate to="/login" replace />} />
+          
+          {/* Catch all - 404 */}
+          <Route path="*" element={<div>Page not found</div>} />
+        </Routes>
+      </BrowserRouter>
+    </AuthProvider>
+  );
 }
-export default App
+
+export default App;

@@ -11,7 +11,21 @@ return new class extends Migration
      */
     public function up(): void
     {
-        //
+        Schema::create('events', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('gym_id')->constrained()->onDelete('cascade');
+            $table->string('title', 100);
+            $table->text('description')->nullable();
+            $table->dateTime('start_datetime');
+            $table->dateTime('end_datetime');
+            $table->string('location', 100)->nullable();
+            $table->integer('max_attendees')->nullable();
+            $table->decimal('price', 10, 2)->default(0.00);
+            $table->string('image_url', 255)->nullable();
+            $table->boolean('is_published')->default(false);
+            $table->timestamps();
+
+        });
     }
 
     /**
@@ -19,6 +33,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        //
+        Schema::dropIfExists('events');
     }
 };
