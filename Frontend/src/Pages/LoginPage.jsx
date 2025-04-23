@@ -50,10 +50,10 @@ function LoginPage() {
   };
 
   return (
-    <div className="flex min-h-svh flex-col items-center justify-center bg-blue-200 p-6 md:p-10">
+    <div className="flex min-h-svh flex-col items-center justify-center bg-gray-200 p-6 md:p-10">
       <div className="w-full max-w-sm md:max-w-3xl">
         <div className={cn("flex flex-col gap-6")}>
-          <Card className="overflow-hidden bg-white p-0 border-gray-200 shadow-md rounded-2xl">
+          <Card className="overflow-hidden bg-white p-0 border-gray-300 shadow-none  rounded-2xl">
             <CardContent className="grid p-0 md:grid-cols-2 ">
               <form className="p-6 md:p-8 border-gray-300" onSubmit={handleSubmit}>
                 <div className="flex flex-col gap-6">
@@ -70,7 +70,7 @@ function LoginPage() {
                   </div>
                   <div className="grid gap-3">
                     <div className="mb-4">
-                      <label className="block text-gray-700 mb-2">User Type</label>
+                      <label className="block text-sm leading-none font-medium mb-2">User Type</label>
                       <Select value={userType} onValueChange={(value) => setUserType(value)} className={"bg-gray-400 focus:ring-gray-300"}>
                         <SelectTrigger className="w-full bg-gray-200 text-black border border-gray-400 rounded-md shadow-sm focus:ring-2 focus:ring-gray-300">
                           <SelectValue placeholder="Selectionner Un Type" />

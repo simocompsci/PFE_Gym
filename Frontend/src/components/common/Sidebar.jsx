@@ -4,7 +4,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { Link } from "react-router-dom";
 
 const SIDEBAR_ITEMS = [
-	{name: "Overview",icon: BarChart2,color: "black",href: "/",},
+	{name: "Overview",icon: BarChart2,color: "black",href: "/admin/dashboard",},
     { name: "Staff", icon: ShoppingBag, color: "black", href: "/staff" },
 	{ name: "Clients", icon: Users, color: "black", href: "/clients" },
 	{ name: "Classes", icon: DollarSign, color: "black", href: "/classes" },
@@ -22,12 +22,12 @@ const Sidebar = () => {
 			}`}
 			animate={{ width: isSidebarOpen ? 256 : 80 }}
 		>
-			<div className='h-full bg-emerald-500 p-4 flex flex-col border-r border-r-gray-300'>
+			<div className='h-full bg-blue-400  p-4 flex flex-col border-r border-r-gray-300'>
 				<motion.button
 					whileHover={{ scale: 1.1 }}
 					whileTap={{ scale: 0.9 }}
 					onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-					className='p-2 rounded-full text-gray-100 hover:bg-gray-100 hover:text-black transition-colors max-w-fit'
+					className='p-2 rounded-full text-gray-100 hover:bg-blue-300 hover:text-white transition-colors max-w-fit'
 				>
 					<Menu size={24} />
 				</motion.button>
@@ -35,7 +35,7 @@ const Sidebar = () => {
 				<nav className='mt-8 flex-grow'>
 					{SIDEBAR_ITEMS.map((item) => (
 						<Link key={item.href} to={item.href}>
-							<motion.div className='flex items-center p-4 text-base font-medium rounded-lg hover:bg-emerald-300 text-gray-100 hover:text-white transition-colors mb-2 group'>
+							<motion.div className='flex items-center p-4 text-base font-medium rounded-lg hover:bg-blue-300 text-gray-100 hover:text-white transition-colors mb-2 group'>
 								<item.icon size={20} style={{ minWidth: "20px" }} className="text-white group-hover:text-white transition-colors" />
 								<AnimatePresence>
 									{isSidebarOpen && (

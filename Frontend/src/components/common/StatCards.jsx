@@ -14,7 +14,7 @@ const StatCards = () => {
 			{overviewData.map((item, index) => (
 				<motion.div
 					key={item.name}
-					className='bg-emerald-200 bg-opacity-50 border border-emerald-300 rounded-xl p-6'
+					className='bg-blue-200 bg-opacity-50 border border-blue-300 rounded-xl p-6'
 					initial={{ opacity: 0, y: 20 }}
 					animate={{ opacity: 1, y: 0 }}
 					transition={{ delay: index * 0.1 }}
