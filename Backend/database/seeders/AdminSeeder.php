@@ -24,7 +24,7 @@ class AdminSeeder extends Seeder
             'is_owner' => true,
             'last_login' => now(),
         ]);
-        
+    
         Admin::create([
             'gym_id' => 1,
             'first_name' => 'Manager',
