@@ -102,7 +102,7 @@ function LoginPage() {
                       required className={"border-gray-200 focus:ring-gray-300"} />
                   </div>
                   <Button type="submit"
-                    className="w-full bg-blue-500 text-white py-2 rounded hover:bg-blue-600"
+                    className="w-full bg-black text-white py-2 rounded hover:bg-gray-800"
                     disabled={loading}>
                     {loading ? 'Logging in...' : 'Login'}
                   </Button>

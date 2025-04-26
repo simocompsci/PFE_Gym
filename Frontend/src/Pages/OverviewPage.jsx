@@ -4,6 +4,8 @@ import StatCards from '../components/common/StatCards'
 import { motion } from 'framer-motion'
 import MessageCards from '../components/common/MessageCrads'
 import { BarChart2, ShoppingBag, Users, Zap } from "lucide-react";
+import Calendar from '../components/common/Calendar';
+import ClassCards from '../components/classes/ClassCards';
 
 
 const OverviewPage = () => {
@@ -16,13 +18,14 @@ const OverviewPage = () => {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 1 }}
       >
-        <div className='grid grid-cols-1 lg:grid-cols-2 gap-5'>
-          <MessageCards name='Total Clients' icon={Zap} value='9879' color='#72b7ef' />
+        <div className='grid grid-cols-1 lg:grid-cols-2 gap-3'>
+          <MessageCards name='Total Clients' icon={Zap} value='You should always strive to be better' color='#72b7ef' />
           <MessageCards name='Total Clients' icon={Zap} value='9879' color='#72b7ef' />
         </div>
         <StatCards />
-        
-
+        <div className="mt-8">
+          <Calendar />
+        </div>
       </motion.div>
     </div>
   )
