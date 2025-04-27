@@ -4,6 +4,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from '../../lib/AuthContext';
 
+
 const SIDEBAR_ITEMS = [
 	{name: "Overview",icon: BarChart2,color: "black",href: "/admin/dashboard",},
     { name: "Staff", icon: ShoppingBag, color: "black", href: "/staff" },

@@ -4,8 +4,9 @@ import StatCards from '../components/common/StatCards'
 import { motion } from 'framer-motion'
 import MessageCards from '../components/common/MessageCrads'
 import { BarChart2, ShoppingBag, Users, Zap } from "lucide-react";
-import Calendar from '../components/common/Calendar';
-import ClassCards from '../components/classes/ClassCards';
+import MyCalendar from '@/components/Overview/MyCalendar'
+import GymEvents from '@/components/Overview/GymEvents'
+import StaffAttendance from '@/components/Overview/StaffAttendance'
 
 
 const OverviewPage = () => {
@@ -19,12 +20,27 @@ const OverviewPage = () => {
         transition={{ duration: 1 }}
       >
         <div className='grid grid-cols-1 lg:grid-cols-2 gap-3'>
-          <MessageCards name='Total Clients' icon={Zap} value='You should always strive to be better' color='#72b7ef' />
-          <MessageCards name='Total Clients' icon={Zap} value='9879' color='#72b7ef' />
+          <MessageCards
+            type="quote"
+            icon={Zap}
+            color="#72b7ef"
+            quote="You should always strive to be better."
+            author="Unknown"
+          />
+          <MessageCards
+            type="event"
+            icon={Zap}
+            color="#72b7ef"
+            eventTitle="Yoga Masterclass"
+            eventTime="18:00"
+            eventType="Class"
+          />
         </div>
         <StatCards />
-        <div className="mt-8">
-          <Calendar />
+        <div className="grid grid-cols-3 gap-3 mt-4 sm:grid-cols-2 lg:grid-cols-3 mb-8">
+          <MyCalendar />
+          <GymEvents />
+          <StaffAttendance />
         </div>
       </motion.div>
     </div>

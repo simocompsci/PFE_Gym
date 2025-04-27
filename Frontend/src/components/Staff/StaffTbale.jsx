@@ -6,60 +6,119 @@ import { Edit } from 'lucide-react';
 
 const StaffTbale = () => {
     const [users, setUsers] = useState([
-        { id: 1, name: "John Doe", email: "john@example.com", role: "customer", status: "active" },
-        { id: 2, name: "Jane Smith", email: "jane@example.com", role: "admin", status: "active" },
-        { id: 3, name: "Bob Johnson", email: "bob@example.com", role: "customer", status: "inactive" },
-        { id: 4, name: "Alice Brown", email: "alice@example.com", role: "customer", status: "active" },
-        { id: 5, name: "Charlie Wilson", email: "charlie@example.com", role: "moderator", status: "active" },
+        { id: 1, name: "Sara Benali", email: "sara@fitgym.com", phone: "0654321987", role: "Coach", present: true },
+        { id: 2, name: "Omar Hachem", email: "omar@fitgym.com", phone: "0678123456", role: "Coach", present: false },
+        { id: 3, name: "Lina Sassi", email: "lina@fitgym.com", phone: "0667891234", role: "Secretary", present: true },
+        { id: 4, name: "Rami Toumi", email: "rami@fitgym.com", phone: "0645678912", role: "Secretary", present: false },
     ]);
-    const [filteredUsers, setFilteredUsers] = useState([]);
+    const [filteredUsers, setFilteredUsers] = useState(users);
     const [searchTerm, setSearchTerm] = useState("");
     const [currentUser, setCurrentUser] = useState(null);
+
+    // Modal states
+    const [showModal, setShowModal] = useState(false);
+    const [modalType, setModalType] = useState('add'); // 'add' | 'edit' | 'view'
+
+    const [formData, setFormData] = useState({ name: '', email: '', phone: '', role: 'Coach', present: false });
 
     // Pagination states
     const [currentPage, setCurrentPage] = useState(1);
     const [usersPerPage] = useState(10);
 
     const handleSearch = (e) => {
-        const term = e.target.value.toLowerCase();
+        const term = e.target.value;
         setSearchTerm(term);
+        const lowerTerm = term.toLowerCase();
         const filtered = users.filter(
             (user) =>
-                user.name.toLowerCase().includes(term) ||
-                user.email.toLowerCase().includes(term) ||
-                user.role.toLowerCase().includes(term)
+                user.name.toLowerCase().includes(lowerTerm) ||
+                user.email.toLowerCase().includes(lowerTerm) ||
+                user.phone.toLowerCase().includes(lowerTerm) ||
+                user.role.toLowerCase().includes(lowerTerm)
         );
         setFilteredUsers(filtered);
+        setCurrentPage(1);
     };
 
-    const handleInputChange = (e) => {
-        const { name, value } = e.target;
-        setFormData({ ...formData, [name]: value });
+
+    // CRUD logic
+    const handleAdd = () => {
+        setFormData({ name: '', email: '', phone: '', role: 'Coach', present: false });
+        setModalType('add');
+        setShowModal(true);
     };
+    const handleEdit = (user) => {
+        setFormData(user);
+        setModalType('edit');
+        setShowModal(true);
+    };
+    const handleView = (user) => {
+        setFormData(user);
+        setModalType('view');
+        setShowModal(true);
+    };
+
+    const handleDelete = (userId) => {
+        if (window.confirm('Are you sure you want to delete this staff member?')) {
+            setUsers(users.filter(u => u.id !== userId));
+            setFilteredUsers(filteredUsers.filter(u => u.id !== userId));
+        }
+    };
+    const handleFormSubmit = (e) => {
+        e.preventDefault();
+        if (modalType === 'add') {
+            const newUser = { ...formData, id: Date.now() };
+            setUsers([...users, newUser]);
+            setFilteredUsers([...filteredUsers, newUser]);
+        } else if (modalType === 'edit') {
+            setUsers(users.map(u => u.id === formData.id ? formData : u));
+            setFilteredUsers(filteredUsers.map(u => u.id === formData.id ? formData : u));
+        }
+        setShowModal(false);
+    };
+
+
+    const handleInputChange = (e) => {
+        const { name, value, type, checked } = e.target;
+        setFormData({ ...formData, [name]: type === 'checkbox' ? checked : value });
+    };
+
+    // Pagination calculations
+    const indexOfLastUser = currentPage * usersPerPage;
+    const indexOfFirstUser = indexOfLastUser - usersPerPage;
+    const totalPages = Math.ceil(filteredUsers.length / usersPerPage);
+
+    // Pagination handlers
+    const prevPage = () => setCurrentPage((prev) => Math.max(prev - 1, 1));
+    const nextPage = () => setCurrentPage((prev) => Math.min(prev + 1, totalPages));
+    const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
     return (
         <>
             <motion.div
-                className="bg-gray-100 border border-gray-200 rounded-xl p-6"
+                className="bg-white bg-opacity-50 shadow-sm rounded-xl p-6"
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.2 }}
             >
                 <div className="flex justify-between items-center mb-6">
-                    <h2 className="text-xl font-semibold text-gray-900">Users</h2>
+                    <h2 className="text-lg font-bold font-sans text-gray-900">Staff Table</h2>
                     <div className="flex space-x-4">
                         <div className="relative">
                             <input
                                 type="text"
-                                placeholder="Search users..."
-                                className="bg-gray-400 bg-opacity-15 text-black  placeholder-gray-400 rounded-lg pl-10 pr-4 py-2 focus:outline-none focus:ring-2 focus:ring-gray-500"
+                                placeholder="Search Staff..."
+                                className="bg-gray-100 text-gray-800 placeholder-gray-400 rounded-lg pl-10 pr-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-200 font-sans font-medium shadow-sm"
+                                value={searchTerm}
+                                onChange={handleSearch}
                             />
-                            <Search className="absolute left-3 top-2.5 text-gray-600" size={18} />
+                            <Search className="absolute left-3 top-2.5 text-gray-200" size={18} />
                         </div>
                         <button
-                            className="bg-[#118ac1] hover:bg-[#118ac1]/50 text-white px-4 py-2 rounded-lg flex items-center"
+                            className="bg-black hover:bg-gray-800 text-white px-4 py-2 rounded-lg flex items-center shadow"
+                            onClick={handleAdd}
                         >
-                            <Plus size={18} className="mr-1" /> Add User
+                            <Plus size={18} className="mr-1" /> Add Staff
                         </button>
                     </div>
                 </div>
@@ -104,21 +163,12 @@ const StaffTbale = () => {
                     <table className="min-w-full border-separate border-spacing-y-1 border-spacing-x-0">
                         <thead>
                             <tr className="bg-gray-900">
-                                <th className='px-6 py-3 text-left text-xs font-medium text-gray-100 uppercase tracking-wider rounded-s-lg'>
-                                    Name
-                                </th>
-                                <th className='px-6 py-3 text-left text-xs font-medium text-gray-100 uppercase tracking-wider'>
-                                    Email
-                                </th>
-                                <th className='px-6 py-3 text-left text-xs font-medium text-gray-100 uppercase tracking-wider'>
-                                    Role
-                                </th>
-                                <th className='px-6 py-3 text-left text-xs font-medium text-gray-100 uppercase tracking-wider'>
-                                    Status
-                                </th>
-                                <th className='px-6 py-3 text-left text-xs font-medium text-gray-100 uppercase tracking-wider rounded-e-lg'>
-                                    Actions
-                                </th>
+                                <th className='px-6 py-3 text-left text-sm font-bold font-sans text-white uppercase tracking-tight rounded-s-lg'>Name</th>
+                                <th className='px-6 py-3 text-left text-sm font-bold font-sans text-white uppercase tracking-tight'>Email</th>
+                                <th className='px-6 py-3 text-left text-sm font-bold font-sans text-white uppercase tracking-tight'>Phone</th>
+                                <th className='px-6 py-3 text-left text-sm font-bold font-sans text-white uppercase tracking-tight'>Role</th>
+                                <th className='px-6 py-3 text-left text-sm font-bold font-sans text-white uppercase tracking-tight'>Present</th>
+                                <th className='px-6 py-3 text-left text-sm font-bold font-sans text-white uppercase tracking-tight rounded-e-lg'>Actions</th>
                             </tr>
                         </thead>
                         <tbody className='divide-y divide-gray-700'>
@@ -129,38 +179,57 @@ const StaffTbale = () => {
                                     </td>
                                 </tr>
                             ) : (
-                                users.map((user, index) => (
+                                filteredUsers.slice(indexOfFirstUser, indexOfLastUser).map((user, index) => (
                                     <motion.tr
                                         key={user.id}
                                         initial={{ opacity: 0 }}
                                         animate={{ opacity: 1 }}
                                         transition={{ duration: 0.3 }}
-                                        className={`${index % 2 === 0 ? 'bg-gray-400 bg-opacity-10' : 'bg-gray-100'} overflow-hidden rounded-xl`}
+                                        whileHover={{ backgroundColor: 'rgba(0, 0, 0, 0.05)' }}
                                     >
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 rounded-l-xl">
+                                        <td className={`px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 rounded-l-xl ${index % 2 === 0 ? 'bg-gray-100' : 'bg-white'}`}>
                                             {user.name}
                                         </td>
-                                        <td className='px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900'>
+                                        <td className={`px-6 py-4 whitespace-nowrap text-sm text-gray-800 ${index % 2 === 0 ? 'bg-gray-100' : 'bg-white'}`}>
                                             {user.email}
                                         </td>
-                                        <td className='px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900'>
-                                            {user.role}
+                                        <td className={`px-6 py-4 whitespace-nowrap text-sm text-gray-800 ${index % 2 === 0 ? 'bg-gray-100' : 'bg-white'}`}>
+                                            {user.phone}
                                         </td>
-                                        <td className='px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900'>
-                                            {user.status}
+                                        <td className={`px-6 py-4 whitespace-nowrap text-xs ${index % 2 === 0 ? 'bg-gray-100' : 'bg-white'}`}>
+                                            <span className={`px-2 py-1 rounded font-semibold border ${user.role === 'Coach' ? 'bg-blue-100 text-blue-700 border-blue-200' : 'bg-emerald-100 text-emerald-700 border-emerald-200'}`}>{user.role}</span>
                                         </td>
-                                        <td className='px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 rounded-r-xl'>
+                                        <td className={`px-6 py-4 whitespace-nowrap text-xs ${index % 2 === 0 ? 'bg-gray-100' : 'bg-white'}`}>
+                                            {user.present ? (
+                                                <span className="inline-flex items-center gap-1 px-2 py-1 bg-green-100 text-green-700 rounded font-semibold border border-green-200">
+                                                    <svg width="14" height="14" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7"/></svg>
+                                                    Yes
+                                                </span>
+                                            ) : (
+                                                <span className="inline-flex items-center gap-1 px-2 py-1 bg-red-100 text-red-700 rounded font-semibold border border-red-200">
+                                                    <svg width="14" height="14" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+                                                    No
+                                                </span>
+                                            )}
+                                        </td>
+                                        <td className={`px-6 py-4 whitespace-nowrap text-xs rounded-r-xl flex gap-2 ${index % 2 === 0 ? 'bg-gray-100' : 'bg-white'}`}>
                                             <button
-                                                className='text-blue-900 hover:text-blue-500 mr-2'
-
+                                                className='text-gray-500 hover:text-blue-700 p-1 transition duration-200'
+                                                onClick={() => handleView(user)}
                                             >
-                                                <Edit size={20} />
+                                                <svg width="18" height="18" fill="none" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2"/><circle cx="12" cy="12" r="3" stroke="currentColor" strokeWidth="2"/></svg>
                                             </button>
                                             <button
-                                                className='text-red-700 hover:text-red-500'
-
+                                                className='text-blue-700 hover:text-blue-500 p-1 transition duration-200'
+                                                onClick={() => handleEdit(user)}
                                             >
-                                                <Trash2 size={20} />
+                                                <Edit size={18} />
+                                            </button>
+                                            <button
+                                                className='text-red-700 hover:text-red-500 p-1 transition duration-200'
+                                                onClick={() => handleDelete(user.id)}
+                                            >
+                                                <Trash2 size={18} />
                                             </button>
                                         </td>
                                     </motion.tr>
@@ -173,7 +242,7 @@ const StaffTbale = () => {
                 {filteredUsers.length > 0 && (
                     <div className="flex items-center justify-between mt-4 px-2">
                         <div className="text-md text-gray-900">
-                            Showing {indexOfFirstUser + 1} to {Math.min(indexOfLastUser, filteredUsers.length)} of {filteredUsers.length} users
+                            Showing {indexOfFirstUser + 1} to {Math.min(indexOfLastUser, filteredUsers.length)} of {filteredUsers.length} staff
                         </div>
                         <div className="flex space-x-2">
                             <button
@@ -208,11 +277,57 @@ const StaffTbale = () => {
                     </div>
                 )}
 
-
-
-
-
-
+                {/* Modal for CRUD operations */}
+                {showModal && (
+                    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-30">
+                        <div className="bg-white rounded-xl p-8 min-w-[320px] max-w-lg shadow-xl relative">
+                            <button className="absolute top-2 right-2 text-gray-400 hover:text-gray-700" onClick={() => setShowModal(false)}>&times;</button>
+                            {modalType === 'view' ? (
+                                <div>
+                                    <h3 className="text-lg font-bold font-sans mb-2 text-gray-800">Staff Details</h3>
+                                    <div className="space-y-2">
+                                        <div><span className="font-semibold">Name:</span> {formData.name}</div>
+                                        <div><span className="font-semibold">Email:</span> {formData.email}</div>
+                                        <div><span className="font-semibold">Phone:</span> {formData.phone}</div>
+                                        <div><span className="font-semibold">Role:</span> {formData.role}</div>
+                                        <div><span className="font-semibold">Present:</span> {formData.present ? 'Yes' : 'No'}</div>
+                                    </div>
+                                </div>
+                            ) : (
+                                <form onSubmit={handleFormSubmit} className="space-y-4">
+                                    <h3 className="text-lg font-bold font-sans mb-2 text-gray-800">{modalType === 'add' ? 'Add Staff' : 'Edit Staff'}</h3>
+                                    <div className="flex flex-col gap-2">
+                                        <label className="text-sm font-medium">Name</label>
+                                        <input type="text" name="name" value={formData.name} onChange={handleInputChange} required className="border rounded px-3 py-2 outline-none focus:ring-2 focus:ring-blue-200" />
+                                    </div>
+                                    <div className="flex flex-col gap-2">
+                                        <label className="text-sm font-medium">Email</label>
+                                        <input type="email" name="email" value={formData.email} onChange={handleInputChange} required className="border rounded px-3 py-2 outline-none focus:ring-2 focus:ring-blue-200" />
+                                    </div>
+                                    <div className="flex flex-col gap-2">
+                                        <label className="text-sm font-medium">Phone</label>
+                                        <input type="text" name="phone" value={formData.phone} onChange={handleInputChange} required className="border rounded px-3 py-2 outline-none focus:ring-2 focus:ring-blue-200" />
+                                    </div>
+                                    <div className="flex flex-col gap-2">
+                                        <label className="text-sm font-medium">Role</label>
+                                        <select name="role" value={formData.role} onChange={handleInputChange} className="border rounded px-3 py-2 outline-none focus:ring-2 focus:ring-blue-200">
+                                            <option value="Coach">Coach</option>
+                                            <option value="Secretary">Secretary</option>
+                                        </select>
+                                    </div>
+                                    <div className="flex items-center gap-2">
+                                        <input type="checkbox" name="present" checked={formData.present} onChange={handleInputChange} id="present" />
+                                        <label htmlFor="present" className="text-sm">Present today</label>
+                                    </div>
+                                    <div className="flex justify-end gap-2 mt-4">
+                                        <button type="button" className="px-4 py-2 rounded bg-gray-200 text-gray-700" onClick={() => setShowModal(false)}>Cancel</button>
+                                        <button type="submit" className="px-4 py-2 rounded bg-blue-600 text-white hover:bg-blue-700">{modalType === 'add' ? 'Add' : 'Update'}</button>
+                                    </div>
+                                </form>
+                            )}
+                        </div>
+                    </div>
+                )}
             </motion.div>
         </>
     )
