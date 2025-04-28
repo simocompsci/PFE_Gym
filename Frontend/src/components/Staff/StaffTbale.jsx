@@ -96,7 +96,7 @@ const StaffTbale = () => {
     return (
         <>
             <motion.div
-                className="bg-white bg-opacity-50 shadow-sm rounded-xl p-6"
+                className="bg-white bg-opacity-50 border border-gray-200 rounded-xl p-6"
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.2 }}
@@ -108,9 +108,7 @@ const StaffTbale = () => {
                             <input
                                 type="text"
                                 placeholder="Search Staff..."
-                                className="bg-gray-100 text-gray-800 placeholder-gray-400 rounded-lg pl-10 pr-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-200 font-sans font-medium shadow-sm"
-                                value={searchTerm}
-                                onChange={handleSearch}
+                                className="bg-gray-200 bg-opacity-15 text-black  placeholder-gray-400 rounded-lg pl-10 pr-4 py-2 focus:outline-none focus:ring-2 focus:ring-gray-500"                                onChange={handleSearch}
                             />
                             <Search className="absolute left-3 top-2.5 text-gray-200" size={18} />
                         </div>
@@ -160,18 +158,18 @@ const StaffTbale = () => {
 						</div>
 					) : (
 						<>*/}
-                    <table className="min-w-full border-separate border-spacing-y-1 border-spacing-x-0">
+                    <table className="min-w-full border-separate border-spacing-y-2 border-spacing-x-0 font-sans">
                         <thead>
                             <tr className="bg-gray-900">
-                                <th className='px-6 py-3 text-left text-sm font-bold font-sans text-white uppercase tracking-tight rounded-s-lg'>Name</th>
-                                <th className='px-6 py-3 text-left text-sm font-bold font-sans text-white uppercase tracking-tight'>Email</th>
-                                <th className='px-6 py-3 text-left text-sm font-bold font-sans text-white uppercase tracking-tight'>Phone</th>
-                                <th className='px-6 py-3 text-left text-sm font-bold font-sans text-white uppercase tracking-tight'>Role</th>
-                                <th className='px-6 py-3 text-left text-sm font-bold font-sans text-white uppercase tracking-tight'>Present</th>
-                                <th className='px-6 py-3 text-left text-sm font-bold font-sans text-white uppercase tracking-tight rounded-e-lg'>Actions</th>
+                                <th className='px-2 py-2 text-left text-sm font-semibold text-gray-100 uppercase tracking-wider rounded-s-lg'>Name</th>
+                                <th className='px-2 py-2 text-left text-sm font-semibold text-gray-100 uppercase tracking-wider'>Email</th>
+                                <th className='px-2 py-2 text-left text-sm font-semibold text-gray-100 uppercase tracking-wider'>Phone</th>
+                                <th className='px-2 py-2 text-left text-sm font-semibold text-gray-100 uppercase tracking-wider'>Role</th>
+                                <th className='px-2 py-2 text-left text-sm font-semibold text-gray-100 uppercase tracking-wider'>Present</th>
+                                <th className='px-2 py-2 text-left text-sm font-semibold text-gray-100 uppercase tracking-wider rounded-e-lg'>Actions</th>
                             </tr>
                         </thead>
-                        <tbody className='divide-y divide-gray-700'>
+                        <tbody className="font-sans antialiased">
                             {users.length === 0 ? (
                                 <tr>
                                     <td colSpan="5" className="px-6 py-4 text-center text-gray-900">
@@ -184,50 +182,49 @@ const StaffTbale = () => {
                                         key={user.id}
                                         initial={{ opacity: 0 }}
                                         animate={{ opacity: 1 }}
+                                        exit={{ opacity: 0 }}
                                         transition={{ duration: 0.3 }}
-                                        whileHover={{ backgroundColor: 'rgba(0, 0, 0, 0.05)' }}
+                                        className={index % 2 === 0 ? 'bg-gradient-to-r from-blue-50 to-emerald-50' : 'bg-white'}
                                     >
-                                        <td className={`px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 rounded-l-xl ${index % 2 === 0 ? 'bg-gray-100' : 'bg-white'}`}>
-                                            {user.name}
+                                        <td className="px-2 py-2 whitespace-nowrap text-md font-semibold antialiased text-gray-800 rounded-l-xl">{user.name}</td>
+                                        <td className="px-2 py-2 whitespace-nowrap text-md font-semibold antialiased text-gray-700">{user.email}</td>
+                                        <td className="px-2 py-2 whitespace-nowrap text-md font-semibold antialiased text-gray-700">{user.phone}</td>
+                                        <td className="px-2 py-2 whitespace-nowrap text-md font-semibold antialiased">
+                                            <span className={`px-2 py-0.5 rounded font-semibold border ${user.role === 'Coach' ? 'bg-blue-100 text-blue-700 border-blue-200' : 'bg-emerald-100 text-emerald-700 border-emerald-200'} text-[13px] tracking-tight font-sans`}>{user.role}</span>
                                         </td>
-                                        <td className={`px-6 py-4 whitespace-nowrap text-sm text-gray-800 ${index % 2 === 0 ? 'bg-gray-100' : 'bg-white'}`}>
-                                            {user.email}
-                                        </td>
-                                        <td className={`px-6 py-4 whitespace-nowrap text-sm text-gray-800 ${index % 2 === 0 ? 'bg-gray-100' : 'bg-white'}`}>
-                                            {user.phone}
-                                        </td>
-                                        <td className={`px-6 py-4 whitespace-nowrap text-xs ${index % 2 === 0 ? 'bg-gray-100' : 'bg-white'}`}>
-                                            <span className={`px-2 py-1 rounded font-semibold border ${user.role === 'Coach' ? 'bg-blue-100 text-blue-700 border-blue-200' : 'bg-emerald-100 text-emerald-700 border-emerald-200'}`}>{user.role}</span>
-                                        </td>
-                                        <td className={`px-6 py-4 whitespace-nowrap text-xs ${index % 2 === 0 ? 'bg-gray-100' : 'bg-white'}`}>
+                                        <td className="px-2 py-2 whitespace-nowrap text-md font-semibold antialiased">
                                             {user.present ? (
-                                                <span className="inline-flex items-center gap-1 px-2 py-1 bg-green-100 text-green-700 rounded font-semibold border border-green-200">
-                                                    <svg width="14" height="14" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7"/></svg>
+                                                <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-green-100 text-green-700 rounded font-semibold border border-green-200 text-[10px] font-sans">
+                                                    <svg width="16" height="16" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7"/></svg>
                                                     Yes
                                                 </span>
                                             ) : (
-                                                <span className="inline-flex items-center gap-1 px-2 py-1 bg-red-100 text-red-700 rounded font-semibold border border-red-200">
-                                                    <svg width="14" height="14" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+                                                <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-red-100 text-red-700 rounded font-semibold border border-red-200 text-[10px] font-sans">
+                                                    <svg width="16" height="16" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
                                                     No
                                                 </span>
                                             )}
                                         </td>
-                                        <td className={`px-6 py-4 whitespace-nowrap text-xs rounded-r-xl flex gap-2 ${index % 2 === 0 ? 'bg-gray-100' : 'bg-white'}`}>
+                                        <td className="px-2 py-2 whitespace-nowrap text-sm font-medium text-gray-900 rounded-r-xl">
                                             <button
-                                                className='text-gray-500 hover:text-blue-700 p-1 transition duration-200'
+                                                className='text-gray-400 hover:text-blue-600 p-2 rounded-full transition-colors duration-150'
                                                 onClick={() => handleView(user)}
+                                                title="View"
                                             >
+                                                <span className="sr-only">View</span>
                                                 <svg width="18" height="18" fill="none" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2"/><circle cx="12" cy="12" r="3" stroke="currentColor" strokeWidth="2"/></svg>
                                             </button>
                                             <button
-                                                className='text-blue-700 hover:text-blue-500 p-1 transition duration-200'
+                                                className='text-blue-500 hover:text-blue-700 p-2 rounded-full transition-colors duration-150'
                                                 onClick={() => handleEdit(user)}
+                                                title="Edit"
                                             >
                                                 <Edit size={18} />
                                             </button>
                                             <button
-                                                className='text-red-700 hover:text-red-500 p-1 transition duration-200'
+                                                className='text-red-400 hover:text-red-600 p-2 rounded-full transition-colors duration-150'
                                                 onClick={() => handleDelete(user.id)}
+                                                title="Delete"
                                             >
                                                 <Trash2 size={18} />
                                             </button>

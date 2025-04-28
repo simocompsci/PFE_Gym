@@ -37,7 +37,7 @@ const OverviewPage = () => {
           />
         </div>
         <StatCards />
-        <div className="grid grid-cols-3 gap-3 mt-4 sm:grid-cols-2 lg:grid-cols-3 mb-8">
+        <div className="grid grid-cols-3 gap-3 mt-4 sm:grid-cols-2 lg:grid-cols-3 mb-8 xl:grid-cols-3">
           <MyCalendar />
           <GymEvents />
           <StaffAttendance />

@@ -57,33 +57,6 @@ const classData = [
     duration_minutes: 50,
     color_code: "#b7e3fa",
   },
-  {
-    id: 7,
-    name: "Yoga Flow",
-    description: "A relaxing yoga class for all levels.",
-    coach: "Sarah Lee",
-    max_capacity: 20,
-    duration_minutes: 60,
-    color_code: "#f9e79f",
-  },
-  {
-    id: 8,
-    name: "HIIT Blast",
-    description: "High-intensity interval training to get your heart pumping!",
-    coach: "Mike Tyson",
-    max_capacity: 15,
-    duration_minutes: 45,
-    color_code: "#fad7a0",
-  },
-  {
-    id: 9,
-    name: "Pilates Core",
-    description: "Strengthen your core and improve flexibility.",
-    coach: "Anna Smith",
-    max_capacity: 18,
-    duration_minutes: 50,
-    color_code: "#b7e3fa",
-  },
 ];
 
 const statusColors = [

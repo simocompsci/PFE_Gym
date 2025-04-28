@@ -3,8 +3,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import myImage from '../assets/Screenshot from 2025-04-18 11-02-15.png';
-
+import MyImage from "../assets/MyImage.jpg"
 export function LoginForm({
   className,
   ...props

@@ -7,7 +7,7 @@ const ClassesPage = () => {
     <>
       <Header title="Classes" />
 
-      <div className="mt-12">
+      <div>
         <ClassCards />
       </div></>
 
