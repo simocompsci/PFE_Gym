@@ -1,5 +1,4 @@
 import React from 'react';
-import { Heart } from 'lucide-react';
 
 const products = [
     {
@@ -87,42 +86,58 @@ const products = [
 
 const ProductsCards = () => {
     return (
-        <div className="w-full grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8 justify-items-center py-8">
+        <div className="w-full grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5 justify-items-center py-8 px-4">
             {products.map((product, idx) => (
-                <div key={idx} className="max-w-xs bg-white rounded-2xl p-5 flex flex-col items-center border border-gray-200">
-                    <div className="relative w-full flex justify-center">
-                        <img
-                            src={product.image}
-                            alt={product.name}
-                            className="rounded-xl w-48 h-48 object-cover bg-gray-100 border border-gray-300"
-                        />
-                        <button className="absolute top-3 right-3 bg-[color:var(--card)] rounded-full shadow p-1 hover:bg-[color:var(--accent)] transition">
-                            <Heart size={22} className="text-[color:var(--primary)] transition" fill="white" />
-                        </button>
+                <div key={idx} className="w-full max-w-[280px] bg-white rounded-xl shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden flex flex-col h-full border border-gray-100">
+                    {/* Product Image Container */}
+                    <div className="relative w-full p-4 bg-gray-50">
+                        <div className="relative h-36 overflow-hidden rounded-lg flex items-center justify-center">
+                            <img
+                                src={product.image}
+                                alt={product.name}
+                                className="h-auto transition-transform duration-500 hover:scale-105"
+                                style={{ width: '200px', height: '200px' }}
+                            />
+                        </div>
                     </div>
-                    <div className="mt-5 w-full">
-                        <h3 className="font-bold text-lg text-[color:var(--card-foreground)] mb-2 leading-tight text-center transition">{product.name}</h3>
-                        <div className="flex gap-2 mb-3 justify-center">
+                    
+                    {/* Product Content */}
+                    <div className="p-5 flex flex-col flex-grow">
+                        {/* Product Name */}
+                        <h3 className="font-bold text-sm text-[color:var(--card-foreground)] mb-2 leading-tight line-clamp-2 h-10">
+                            {product.name}
+                        </h3>
+                        
+                        {/* Product Description */}
+                        <p className="text-[color:var(--muted-foreground)] text-xs mb-3 line-clamp-2 flex-grow">
+                            {product.description}
+                        </p>
+                        
+                        {/* Size Options */}
+                        <div className="flex flex-wrap gap-1 mb-3">
                             {product.sizes.map((size) => (
                                 <span
                                     key={size}
-                                    className={`px-3 py-1 rounded-full border text-xs font-semibold transition-all duration-150 ${size === product.selectedSize
-                                        ? 'bg-[color:var(--primary)] text-[color:var(--primary-foreground)] border-[color:var(--primary)] shadow'
-                                        : 'bg-[color:var(--muted)] text-[color:var(--muted-foreground)] border-[color:var(--border)] hover:bg-[color:var(--accent)]'}`}
+                                    className={`px-2 py-0.5 rounded-md text-xs font-medium transition-all duration-200 cursor-pointer ${size === product.selectedSize
+                                        ? 'bg-[color:var(--primary)] text-white border-[color:var(--primary)] shadow-sm'
+                                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}
                                 >
                                     {size}
                                 </span>
                             ))}
                         </div>
-                        <p className="text-[color:var(--muted-foreground)] text-sm mb-5 min-h-[48px] text-center">{product.description}</p>
-                        <div className="font-extrabold text-2xl text-[color:var(--card-foreground)] text-center tracking-tight">
-                            {product.currency}{product.price}
+                        
+                        {/* Price */}
+                        <div className="mt-auto pt-3 border-t border-gray-100">
+                            <div className="font-bold text-lg text-[color:var(--card-foreground)] tracking-tight">
+                                {product.currency}{product.price}
+                            </div>
                         </div>
                     </div>
                 </div>
             ))}
         </div>
     );
-};;
+};
 
 export default ProductsCards;
