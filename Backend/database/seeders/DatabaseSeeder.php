@@ -14,12 +14,15 @@ class DatabaseSeeder extends Seeder
     {
         // First create the gym
         $this->call(GymSeeder::class);
-        
+
         // Then create the users
         $this->call([
             AdminSeeder::class,
             CoachSeeder::class,
             SecretarySeeder::class,
         ]);
+
+        // Create clients with memberships
+        $this->call(ClientSeeder::class);
     }
 }

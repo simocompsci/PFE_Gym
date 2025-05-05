@@ -2,7 +2,7 @@ import React from 'react'
 import Header from '@/components/common/header'
 import { motion } from 'framer-motion'
 import StatCards from '@/components/common/StatCards'
-import StaffTbale from '@/components/Staff/StaffTbale'
+import StaffTbale from '@/components/Staff/StaffTable'
 
 const StaffPage = () => {
   return (

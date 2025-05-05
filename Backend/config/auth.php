@@ -38,7 +38,7 @@ return [
     // config/auth.php
     'guards' => [
         'admin' => [
-            'driver' => 'sunctum',
+            'driver' => 'sanctum',
             'provider' => 'admins',
         ],
         'coach' => [
@@ -56,15 +56,10 @@ return [
             'driver' => 'eloquent',
             'model' => App\Models\Admin::class,
         ],
-    ],
-
-    'providers' => [
         'coaches' => [
             'driver' => 'eloquent',
             'model' => App\Models\Coach::class,
         ],
-    ],
-    'providers' => [
         'secretaries' => [
             'driver' => 'eloquent',
             'model' => App\Models\Secretary::class,
@@ -89,17 +84,17 @@ return [
     |
     */
 
-    'providers' => [
-        'users' => [
-            'driver' => 'eloquent',
-            'model' => env('AUTH_MODEL', App\Models\User::class),
-        ],
-
-        // 'users' => [
-        //     'driver' => 'database',
-        //     'table' => 'users',
-        // ],
-    ],
+    // Default user provider (not used in this app)
+    // 'providers' => [
+    //     'users' => [
+    //         'driver' => 'eloquent',
+    //         'model' => env('AUTH_MODEL', App\Models\User::class),
+    //     ],
+    //     // 'users' => [
+    //     //     'driver' => 'database',
+    //     //     'table' => 'users',
+    //     // ],
+    // ],
 
     /*
     |--------------------------------------------------------------------------
@@ -127,24 +122,18 @@ return [
             'expire' => 60,
             'throttle' => 60,
         ],
-    ],
-    'passwords' => [
         'admins' => [
             'provider' => 'admins',
             'table' => env('AUTH_PASSWORD_RESET_TOKEN_TABLE', 'password_reset_tokens'),
             'expire' => 60,
             'throttle' => 60,
         ],
-    ],
-    'passwords' => [
         'coaches' => [
             'provider' => 'coaches',
             'table' => env('AUTH_PASSWORD_RESET_TOKEN_TABLE', 'password_reset_tokens'),
             'expire' => 60,
             'throttle' => 60,
         ],
-    ],
-    'passwords' => [
         'secretaries' => [
             'provider' => 'secretaries',
             'table' => env('AUTH_PASSWORD_RESET_TOKEN_TABLE', 'password_reset_tokens'),
