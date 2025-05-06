@@ -111,4 +111,80 @@ export const clientService = {
   }
 };
 
+export const classService = {
+  // Get all classes
+  getAll: async () => {
+    await getCsrfCookie();
+    return api.get('/admin/classes');
+  },
+
+  // Get a specific class
+  getById: async (id) => {
+    await getCsrfCookie();
+    return api.get(`/admin/classes/${id}`);
+  },
+
+  // Create a new class
+  create: async (classData) => {
+    await getCsrfCookie();
+    return api.post('/admin/classes', classData);
+  },
+
+  // Update an existing class
+  update: async (id, classData) => {
+    await getCsrfCookie();
+    return api.put(`/admin/classes/${id}`, classData);
+  },
+
+  // Delete a class
+  delete: async (id) => {
+    await getCsrfCookie();
+    return api.delete(`/admin/classes/${id}`);
+  },
+
+  // Get all coaches for dropdown
+  getCoaches: async () => {
+    await getCsrfCookie();
+    return api.get('/admin/coaches-list');
+  }
+};
+
+export const productService = {
+  // Get all products
+  getAll: async () => {
+    await getCsrfCookie();
+    return api.get('/admin/products');
+  },
+
+  // Get a specific product
+  getById: async (id) => {
+    await getCsrfCookie();
+    return api.get(`/admin/products/${id}`);
+  },
+
+  // Create a new product
+  create: async (productData) => {
+    await getCsrfCookie();
+    return api.post('/admin/products', productData);
+  },
+
+  // Update an existing product
+  update: async (id, productData) => {
+    await getCsrfCookie();
+    return api.put(`/admin/products/${id}`, productData);
+  },
+
+  // Delete a product
+  delete: async (id) => {
+    await getCsrfCookie();
+    return api.delete(`/admin/products/${id}`);
+  },
+
+  // Get all product categories
+  getCategories: async () => {
+    await getCsrfCookie();
+    return api.get('/admin/product-categories');
+  }
+};
+
 export default api;

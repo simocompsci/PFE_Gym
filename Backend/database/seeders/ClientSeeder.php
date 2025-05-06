@@ -26,11 +26,11 @@ class ClientSeeder extends Seeder
                 'email' => 'info@mainfitness.com',
             ]);
         }
-        
+
         // Check if we have membership plans, if not create some
         if (MembershipPlan::count() === 0) {
             $gymId = Gym::first()->id;
-            
+
             MembershipPlan::create([
                 'gym_id' => $gymId,
                 'name' => 'Bronze',
@@ -40,7 +40,7 @@ class ClientSeeder extends Seeder
                 'features' => json_encode(['gym_access' => true]),
                 'is_active' => true,
             ]);
-            
+
             MembershipPlan::create([
                 'gym_id' => $gymId,
                 'name' => 'Silver',
@@ -50,7 +50,7 @@ class ClientSeeder extends Seeder
                 'features' => json_encode(['gym_access' => true, 'classes' => true]),
                 'is_active' => true,
             ]);
-            
+
             MembershipPlan::create([
                 'gym_id' => $gymId,
                 'name' => 'Gold',
@@ -61,10 +61,10 @@ class ClientSeeder extends Seeder
                 'is_active' => true,
             ]);
         }
-        
+
         // Create 30 clients with memberships
         Client::factory()
-            ->count(30)
+            ->count(10)
             ->create()
             ->each(function ($client) {
                 // Create a membership for each client
@@ -72,7 +72,7 @@ class ClientSeeder extends Seeder
                     'client_id' => $client->id,
                 ]);
             });
-            
+
         $this->command->info('30 clients created with memberships!');
     }
 }

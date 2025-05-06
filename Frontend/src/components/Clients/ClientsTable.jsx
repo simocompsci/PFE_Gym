@@ -97,51 +97,107 @@ const ClientsTable = () => {
 
     const handleEdit = async (client) => {
         try {
-            // Get detailed client information if needed
-            // For now, we'll split the name into first_name and last_name
-            const nameParts = client.name.split(' ');
-            const first_name = nameParts[0];
-            const last_name = nameParts.slice(1).join(' ');
+            // Get detailed client information
+            const response = await clientService.getById(client.id);
+            const clientData = response.data.data;
 
-            setFormData({
-                id: client.id,
-                first_name,
-                last_name,
-                email: client.email || '',
-                phone: client.phone,
-                membership: client.membership,
-                is_active: client.active,
-                gym_id: 1
-            });
+            // If we have detailed data, use it
+            if (clientData) {
+                setFormData({
+                    id: clientData.id,
+                    first_name: clientData.first_name,
+                    last_name: clientData.last_name,
+                    email: clientData.email || '',
+                    phone: clientData.phone,
+                    membership: clientData.membership_plan?.name || 'Gold',
+                    is_active: clientData.is_active,
+                    gym_id: clientData.gym_id || 1
+                });
+            } else {
+                // Fallback to splitting the name if detailed data isn't available
+                const nameParts = client.name.split(' ');
+                const first_name = nameParts[0];
+                const last_name = nameParts.slice(1).join(' ');
+
+                setFormData({
+                    id: client.id,
+                    first_name,
+                    last_name,
+                    email: client.email || '',
+                    phone: client.phone,
+                    membership: client.membership,
+                    is_active: client.active,
+                    gym_id: 1
+                });
+            }
+
             setModalType('edit');
             setShowModal(true);
         } catch (error) {
             console.error('Error preparing client for edit:', error);
+            setNotification({
+                show: true,
+                message: 'Failed to load client details',
+                type: 'error'
+            });
+
+            // Hide notification after 3 seconds
+            setTimeout(() => {
+                setNotification({ show: false, message: '', type: '' });
+            }, 3000);
         }
     };
 
     const handleView = async (client) => {
         try {
-            // Get detailed client information if needed
-            // For now, we'll split the name into first_name and last_name
-            const nameParts = client.name.split(' ');
-            const first_name = nameParts[0];
-            const last_name = nameParts.slice(1).join(' ');
+            // Get detailed client information
+            const response = await clientService.getById(client.id);
+            const clientData = response.data.data;
 
-            setFormData({
-                id: client.id,
-                first_name,
-                last_name,
-                email: client.email || '',
-                phone: client.phone,
-                membership: client.membership,
-                is_active: client.active,
-                gym_id: 1
-            });
+            // If we have detailed data, use it
+            if (clientData) {
+                setFormData({
+                    id: clientData.id,
+                    first_name: clientData.first_name,
+                    last_name: clientData.last_name,
+                    email: clientData.email || '',
+                    phone: clientData.phone,
+                    membership: clientData.membership_plan?.name || 'Gold',
+                    is_active: clientData.is_active,
+                    gym_id: clientData.gym_id || 1
+                });
+            } else {
+                // Fallback to splitting the name if detailed data isn't available
+                const nameParts = client.name.split(' ');
+                const first_name = nameParts[0];
+                const last_name = nameParts.slice(1).join(' ');
+
+                setFormData({
+                    id: client.id,
+                    first_name,
+                    last_name,
+                    email: client.email || '',
+                    phone: client.phone,
+                    membership: client.membership,
+                    is_active: client.active,
+                    gym_id: 1
+                });
+            }
+
             setModalType('view');
             setShowModal(true);
         } catch (error) {
             console.error('Error preparing client for view:', error);
+            setNotification({
+                show: true,
+                message: 'Failed to load client details',
+                type: 'error'
+            });
+
+            // Hide notification after 3 seconds
+            setTimeout(() => {
+                setNotification({ show: false, message: '', type: '' });
+            }, 3000);
         }
     };
 
@@ -222,10 +278,34 @@ const ClientsTable = () => {
                     type: 'success'
                 });
             } else if (modalType === 'edit') {
-                const response = await clientService.update(formData.id, formData);
+                // Prepare the update data
+                const updateData = {
+                    first_name: formData.first_name,
+                    last_name: formData.last_name,
+                    email: formData.email,
+                    phone: formData.phone,
+                    is_active: formData.is_active,
+                    gym_id: formData.gym_id,
+                    membership_plan: formData.membership
+                };
+
+                console.log('Sending update data:', updateData);
+
+                const response = await clientService.update(formData.id, updateData);
                 const updatedClient = response.data.data;
-                setClients(clients.map(c => c.id === updatedClient.id ? updatedClient : c));
-                setFilteredClients(filteredClients.map(c => c.id === updatedClient.id ? updatedClient : c));
+
+                // Create a client object with the format expected by the table
+                const displayClient = {
+                    id: updatedClient.id,
+                    name: `${updatedClient.first_name} ${updatedClient.last_name}`,
+                    email: updatedClient.email,
+                    phone: updatedClient.phone,
+                    membership: updatedClient.membership_plan?.name || formData.membership,
+                    active: updatedClient.is_active
+                };
+
+                setClients(clients.map(c => c.id === updatedClient.id ? displayClient : c));
+                setFilteredClients(filteredClients.map(c => c.id === updatedClient.id ? displayClient : c));
 
                 // Show success notification
                 setNotification({
@@ -683,12 +763,30 @@ const ClientsTable = () => {
                                 />
                                 <label className="text-gray-700 font-semibold">Active</label>
                             </div>
+
+                            {/* Form error message */}
+                            {formError && (
+                                <div className="mb-4 p-3 bg-red-50 border border-red-200 text-red-700 rounded-lg">
+                                    <div className="flex items-center">
+                                        <AlertCircle size={18} className="mr-2" />
+                                        <span className="text-sm">{formError}</span>
+                                    </div>
+                                </div>
+                            )}
                             {modalType !== 'view' && (
                                 <button
                                     type="submit"
-                                    className="w-full bg-black text-white py-2 rounded-lg font-semibold hover:bg-gray-800 transition-colors"
+                                    className="w-full bg-black text-white py-2 rounded-lg font-semibold hover:bg-gray-800 transition-colors flex justify-center items-center"
+                                    disabled={isSubmitting}
                                 >
-                                    {modalType === 'add' ? 'Add Client' : 'Save Changes'}
+                                    {isSubmitting ? (
+                                        <>
+                                            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                                            {modalType === 'add' ? 'Adding...' : 'Saving...'}
+                                        </>
+                                    ) : (
+                                        modalType === 'add' ? 'Add Client' : 'Save Changes'
+                                    )}
                                 </button>
                             )}
                             {modalType === 'view' && (
