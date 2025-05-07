@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Search, Plus, Trash2, ChevronLeft, ChevronRight, Eye, X, AlertCircle, Check } from 'lucide-react';
+import { Search, Plus, Trash2, ChevronLeft, ChevronRight, Eye, X, AlertCircle, Check, User, Mail, Phone, Briefcase, Loader2 } from 'lucide-react';
 import { Edit } from 'lucide-react';
 import { clientService } from '../../lib/api';
+import './ClientsTable.css';
 
 const ClientsTable = () => {
     const [clients, setClients] = useState([]);
@@ -621,7 +622,7 @@ const ClientsTable = () => {
 
             {/* Delete Confirmation Dialog */}
             {showDeleteConfirm && clientToDelete && (
-                <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
+                <div className="fixed inset-0 bg-black bg-opacity-60 backdrop-blur-sm flex items-center justify-center z-50 transition-opacity duration-300">
                     <div className="bg-white rounded-xl shadow-lg p-6 w-full max-w-md mx-auto">
                         <h3 className="text-lg font-bold mb-4 flex items-center text-red-600">
                             <AlertCircle className="mr-2" size={24} />
@@ -660,19 +661,25 @@ const ClientsTable = () => {
 
             {/* Notification Toast */}
             {notification.show && (
-                <div className={`fixed bottom-4 right-4 px-6 py-3 rounded-lg shadow-lg flex items-center z-50 ${
-                    notification.type === 'success' ? 'bg-green-100 text-green-800 border border-green-200' :
-                    'bg-red-100 text-red-800 border border-red-200'
+                <div className={`fixed bottom-4 right-4 px-6 py-3 rounded-lg shadow-xl flex items-center z-50 transform transition-all duration-300 ${
+                    notification.type === 'success'
+                        ? 'bg-gradient-to-r from-green-50 to-green-100 text-green-800 border border-green-200'
+                        : 'bg-gradient-to-r from-red-50 to-red-100 text-red-800 border border-red-200'
                 }`}>
-                    {notification.type === 'success' ? (
-                        <Check className="mr-2" size={20} />
-                    ) : (
-                        <AlertCircle className="mr-2" size={20} />
-                    )}
-                    <span>{notification.message}</span>
+                    <div className={`mr-3 p-2 rounded-full ${
+                        notification.type === 'success' ? 'bg-green-200' : 'bg-red-200'
+                    }`}>
+                        {notification.type === 'success' ? (
+                            <Check className="text-green-600" size={18} />
+                        ) : (
+                            <AlertCircle className="text-red-600" size={18} />
+                        )}
+                    </div>
+                    <span className="font-medium">{notification.message}</span>
                     <button
                         onClick={() => setNotification({ show: false, message: '', type: '' })}
-                        className="ml-4 text-gray-500 hover:text-gray-700"
+                        className="ml-4 text-gray-500 hover:text-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-300 rounded-full p-1"
+                        aria-label="Close notification"
                     >
                         <X size={16} />
                     </button>
@@ -681,124 +688,202 @@ const ClientsTable = () => {
 
             {/* Modal for Add/Edit/View */}
             {showModal && (
-                <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
-                    <div className="bg-white rounded-xl shadow-lg p-8 w-full max-w-md mx-auto">
-                        <h3 className="text-lg font-bold mb-4">
-                            {modalType === 'add' && 'Add Client'}
-                            {modalType === 'edit' && 'Edit Client'}
-                            {modalType === 'view' && 'Client Details'}
-                        </h3>
-                        <form onSubmit={handleFormSubmit}>
-                            <div className="grid grid-cols-2 gap-4 mb-4">
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-60 backdrop-blur-sm transition-opacity duration-300 p-2 sm:p-4 overflow-hidden">
+                    <div className="bg-white rounded-xl shadow-2xl w-full max-w-md mx-auto my-auto transform transition-all duration-300 scale-100 opacity-100 max-h-[95vh] sm:max-h-[90vh] flex flex-col">
+                        {/* Header with gradient background */}
+                        <div className="bg-gradient-to-r from-blue-600 to-indigo-700 rounded-t-xl p-6 text-white relative">
+                            <h2 className="text-2xl font-bold">
+                                {modalType === 'add' && 'Add Client'}
+                                {modalType === 'edit' && 'Edit Client'}
+                                {modalType === 'view' && 'Client Details'}
+                            </h2>
+                            <p className="text-blue-100 mt-1 text-sm">
+                                {modalType === 'add' && 'Fill in the information below to add a new client'}
+                                {modalType === 'edit' && 'Update the client information below'}
+                                {modalType === 'view' && 'View client information'}
+                            </p>
+                            <button
+                                onClick={() => setShowModal(false)}
+                                className="absolute top-4 right-4 text-white hover:text-blue-200 focus:outline-none transition-colors duration-200"
+                                aria-label="Close"
+                            >
+                                <X className="w-6 h-6" />
+                            </button>
+                        </div>
+
+                        <form id="client-form" onSubmit={handleFormSubmit} className="p-6 overflow-y-auto flex-1 custom-scrollbar">
+                            {/* Name fields */}
+                            <div className="grid grid-cols-2 gap-4 mb-5">
                                 <div>
-                                    <label className="block text-gray-700 font-semibold mb-2">First Name</label>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                                        First Name
+                                    </label>
+                                    <div className="relative">
+                                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
+                                            <User size={16} />
+                                        </div>
+                                        <input
+                                            type="text"
+                                            name="first_name"
+                                            value={formData.first_name}
+                                            onChange={handleInputChange}
+                                            className="w-full pl-10 pr-3 py-2.5 border rounded-lg text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors border-gray-300"
+                                            placeholder="John"
+                                            required
+                                            disabled={modalType === 'view'}
+                                        />
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                                        Last Name
+                                    </label>
+                                    <div className="relative">
+                                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
+                                            <User size={16} />
+                                        </div>
+                                        <input
+                                            type="text"
+                                            name="last_name"
+                                            value={formData.last_name}
+                                            onChange={handleInputChange}
+                                            className="w-full pl-10 pr-3 py-2.5 border rounded-lg text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors border-gray-300"
+                                            placeholder="Doe"
+                                            required
+                                            disabled={modalType === 'view'}
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Email field */}
+                            <div className="mb-5">
+                                <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                                    Email
+                                </label>
+                                <div className="relative">
+                                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
+                                        <Mail size={16} />
+                                    </div>
+                                    <input
+                                        type="email"
+                                        name="email"
+                                        value={formData.email}
+                                        onChange={handleInputChange}
+                                        className="w-full pl-10 pr-3 py-2.5 border rounded-lg text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors border-gray-300"
+                                        placeholder="john.doe@example.com"
+                                        disabled={modalType === 'view'}
+                                    />
+                                </div>
+                            </div>
+
+                            {/* Phone field */}
+                            <div className="mb-5">
+                                <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                                    Phone
+                                </label>
+                                <div className="relative">
+                                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
+                                        <Phone size={16} />
+                                    </div>
                                     <input
                                         type="text"
-                                        name="first_name"
-                                        value={formData.first_name}
+                                        name="phone"
+                                        value={formData.phone}
                                         onChange={handleInputChange}
-                                        className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
+                                        className="w-full pl-10 pr-3 py-2.5 border rounded-lg text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors border-gray-300"
+                                        placeholder="+1 (555) 123-4567"
                                         required
                                         disabled={modalType === 'view'}
                                     />
                                 </div>
-                                <div>
-                                    <label className="block text-gray-700 font-semibold mb-2">Last Name</label>
-                                    <input
-                                        type="text"
-                                        name="last_name"
-                                        value={formData.last_name}
+                            </div>
+
+                            {/* Membership field */}
+                            <div className="mb-5">
+                                <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                                    Membership
+                                </label>
+                                <div className="relative">
+                                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
+                                        <Briefcase size={16} />
+                                    </div>
+                                    <select
+                                        name="membership"
+                                        value={formData.membership}
                                         onChange={handleInputChange}
-                                        className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
-                                        required
+                                        className="w-full pl-10 pr-3 py-2.5 border border-gray-300 rounded-lg text-gray-700 appearance-none bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors"
                                         disabled={modalType === 'view'}
-                                    />
+                                    >
+                                        <option value="Gold">Gold</option>
+                                        <option value="Silver">Silver</option>
+                                        <option value="Bronze">Bronze</option>
+                                    </select>
+                                    <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                                        <svg className="h-4 w-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
+                                        </svg>
+                                    </div>
                                 </div>
                             </div>
-                            <div className="mb-4">
-                                <label className="block text-gray-700 font-semibold mb-2">Email</label>
-                                <input
-                                    type="email"
-                                    name="email"
-                                    value={formData.email}
-                                    onChange={handleInputChange}
-                                    className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
-                                    disabled={modalType === 'view'}
-                                />
-                            </div>
-                            <div className="mb-4">
-                                <label className="block text-gray-700 font-semibold mb-2">Phone</label>
-                                <input
-                                    type="text"
-                                    name="phone"
-                                    value={formData.phone}
-                                    onChange={handleInputChange}
-                                    className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
-                                    required
-                                    disabled={modalType === 'view'}
-                                />
-                            </div>
-                            <div className="mb-4">
-                                <label className="block text-gray-700 font-semibold mb-2">Membership</label>
-                                <select
-                                    name="membership"
-                                    value={formData.membership}
-                                    onChange={handleInputChange}
-                                    className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
-                                    disabled={modalType === 'view'}
-                                >
-                                    <option value="Gold">Gold</option>
-                                    <option value="Silver">Silver</option>
-                                    <option value="Bronze">Bronze</option>
-                                </select>
-                            </div>
-                            <div className="mb-6 flex items-center">
+
+                            {/* Active status */}
+                            <div className="mb-6 flex items-center p-3 bg-gray-50 rounded-lg">
                                 <input
                                     type="checkbox"
+                                    id="is_active"
                                     name="is_active"
                                     checked={formData.is_active}
                                     onChange={handleInputChange}
-                                    className="mr-2"
+                                    className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
                                     disabled={modalType === 'view'}
                                 />
-                                <label className="text-gray-700 font-semibold">Active</label>
+                                <label htmlFor="is_active" className="ml-2 text-sm font-medium text-gray-700">
+                                    Active Client
+                                </label>
                             </div>
 
                             {/* Form error message */}
                             {formError && (
-                                <div className="mb-4 p-3 bg-red-50 border border-red-200 text-red-700 rounded-lg">
-                                    <div className="flex items-center">
-                                        <AlertCircle size={18} className="mr-2" />
-                                        <span className="text-sm">{formError}</span>
+                                <div className="mb-6 p-4 bg-red-50 text-red-700 rounded-lg border border-red-100 flex items-start">
+                                    <div className="text-red-500 mr-3 flex-shrink-0 pt-0.5">
+                                        <AlertCircle size={18} />
                                     </div>
+                                    <div className="text-sm font-medium">{formError}</div>
                                 </div>
                             )}
+                        </form>
+
+                        {/* Form actions - fixed at the bottom */}
+                        <div className="p-4 border-t border-gray-100 bg-gray-50 rounded-b-xl flex justify-end gap-3">
+                            <button
+                                type="button"
+                                onClick={() => setShowModal(false)}
+                                className="px-5 py-2.5 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-300 transition-colors"
+                                disabled={isSubmitting}
+                            >
+                                {modalType === 'view' ? 'Close' : 'Cancel'}
+                            </button>
+
                             {modalType !== 'view' && (
                                 <button
+                                    form="client-form"
                                     type="submit"
-                                    className="w-full bg-black text-white py-2 rounded-lg font-semibold hover:bg-gray-800 transition-colors flex justify-center items-center"
                                     disabled={isSubmitting}
+                                    className="px-5 py-2.5 text-sm font-medium text-white bg-black rounded-lg hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors disabled:opacity-50 flex items-center justify-center min-w-[100px]"
                                 >
                                     {isSubmitting ? (
                                         <>
-                                            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                                            {modalType === 'add' ? 'Adding...' : 'Saving...'}
+                                            <Loader2 size={16} className="animate-spin mr-2" />
+                                            <span>{modalType === 'add' ? 'Adding...' : 'Saving...'}</span>
                                         </>
                                     ) : (
-                                        modalType === 'add' ? 'Add Client' : 'Save Changes'
+                                        <span>{modalType === 'add' ? 'Add Client' : 'Save Changes'}</span>
                                     )}
                                 </button>
                             )}
-                            {modalType === 'view' && (
-                                <button
-                                    type="button"
-                                    className="w-full bg-gray-300 text-gray-900 py-2 rounded-lg font-semibold mt-2"
-                                    onClick={() => setShowModal(false)}
-                                >
-                                    Close
-                                </button>
-                            )}
-                        </form>
+                        </div>
                     </div>
                 </div>
             )}

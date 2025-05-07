@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Search, Plus, Trash2, ChevronLeft, ChevronRight, Eye, X, AlertCircle, Check, Edit } from 'lucide-react';
+import {
+  Search, Plus, Trash2, Eye, X, AlertCircle, Check, Edit
+} from 'lucide-react';
 import { productService } from '../../lib/api';
 
 const ProductsCards = () => {
@@ -8,8 +10,6 @@ const ProductsCards = () => {
     const [filteredProducts, setFilteredProducts] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    const [categories, setCategories] = useState([]);
-    const [selectedCategory, setSelectedCategory] = useState('All');
 
     // Modal states
     const [showModal, setShowModal] = useState(false);
@@ -38,10 +38,9 @@ const ProductsCards = () => {
     // Notification state
     const [notification, setNotification] = useState({ show: false, message: '', type: '' });
 
-    // Fetch products and categories on component mount
+    // Fetch products on component mount
     useEffect(() => {
         fetchProductsData();
-        fetchCategoriesData();
     }, []);
 
     const fetchProductsData = async () => {
@@ -65,62 +64,43 @@ const ProductsCards = () => {
         }
     };
 
-    const fetchCategoriesData = async () => {
-        try {
-            const response = await productService.getCategories();
-            const categoriesData = response.data.data;
-            setCategories(['All', ...categoriesData]);
-        } catch (error) {
-            console.error('Error fetching categories:', error);
-        }
-    };
-
     const handleSearch = (e) => {
         const term = e.target.value.toLowerCase();
-        filterProducts(term, selectedCategory);
-    };
 
-    const handleCategoryChange = (category) => {
-        setSelectedCategory(category);
-        filterProducts('', category);
-    };
-
-    const filterProducts = (searchTerm, category) => {
-        let filtered = products;
-
-        // Apply search term filter
-        if (searchTerm) {
-            filtered = filtered.filter(
+        if (term) {
+            const filtered = products.filter(
                 (product) =>
-                    product.name.toLowerCase().includes(searchTerm) ||
-                    product.description?.toLowerCase().includes(searchTerm) ||
-                    product.category?.toLowerCase().includes(searchTerm)
+                    product.name.toLowerCase().includes(term) ||
+                    product.description?.toLowerCase().includes(term) ||
+                    product.category?.toLowerCase().includes(term)
             );
+            setFilteredProducts(filtered);
+        } else {
+            setFilteredProducts(products);
         }
-
-        // Apply category filter
-        if (category && category !== 'All') {
-            filtered = filtered.filter(product => product.category === category);
-        }
-
-        setFilteredProducts(filtered);
     };
 
     // CRUD logic
     const handleAdd = () => {
+        console.log('Add button clicked');
+        // Reset form error if any
+        setFormError(null);
+
         setFormData({
             name: '',
             description: '',
             price: 0,
             cost: 0,
             stock_quantity: 0,
-            category: categories.length > 1 ? categories[1] : '',
+            category: '',
             image_url: '',
             is_active: true,
             gym_id: 1
         });
         setModalType('add');
         setShowModal(true);
+
+        console.log('Modal should be visible now');
     };
 
     const handleEdit = async (product) => {
@@ -258,12 +238,40 @@ const ProductsCards = () => {
         setFormError(null);
         setIsSubmitting(true);
 
+        // Clean up form data
+        const cleanedFormData = { ...formData };
+
+        // Check if image URL is from Brave search and remove it if it is
+        if (cleanedFormData.image_url && cleanedFormData.image_url.includes('imgs.search.brave.com')) {
+            cleanedFormData.image_url = ''; // Clear the problematic URL
+        }
+
+        // Validate required fields
+        const requiredFields = ['name', 'price', 'gym_id'];
+        const missingFields = requiredFields.filter(field => !cleanedFormData[field]);
+
+        if (missingFields.length > 0) {
+            setFormError(`Please fill in all required fields: ${missingFields.join(', ')}`);
+            setIsSubmitting(false);
+            return;
+        }
+
+        // Ensure numeric fields are properly formatted
+        cleanedFormData.price = parseFloat(cleanedFormData.price);
+        cleanedFormData.cost = parseFloat(cleanedFormData.cost) || 0;
+        cleanedFormData.stock_quantity = parseInt(cleanedFormData.stock_quantity) || 0;
+
         try {
             if (modalType === 'add') {
-                const response = await productService.create(formData);
+                console.log('Sending product data to backend:', cleanedFormData);
+                const response = await productService.create(cleanedFormData);
                 const newProduct = response.data.data;
-                setProducts([...products, newProduct]);
-                setFilteredProducts([...filteredProducts, newProduct]);
+
+                console.log('Product created successfully:', newProduct);
+
+                // Update the products list with the new product
+                setProducts(prevProducts => [...prevProducts, newProduct]);
+                setFilteredProducts(prevFiltered => [...prevFiltered, newProduct]);
 
                 // Show success notification
                 setNotification({
@@ -272,8 +280,12 @@ const ProductsCards = () => {
                     type: 'success'
                 });
             } else if (modalType === 'edit') {
-                const response = await productService.update(formData.id, formData);
+                console.log('Updating product data:', cleanedFormData);
+                const response = await productService.update(cleanedFormData.id, cleanedFormData);
                 const updatedProduct = response.data.data;
+
+                console.log('Product updated successfully:', updatedProduct);
+
                 setProducts(products.map(p => p.id === updatedProduct.id ? updatedProduct : p));
                 setFilteredProducts(filteredProducts.map(p => p.id === updatedProduct.id ? updatedProduct : p));
 
@@ -295,13 +307,24 @@ const ProductsCards = () => {
         } catch (error) {
             console.error('Error submitting form:', error);
 
+            // Extract validation errors if available
+            let errorMessage = 'An error occurred while saving the product';
+
+            if (error.response?.data?.errors) {
+                const validationErrors = error.response.data.errors;
+                const errorMessages = Object.values(validationErrors).flat();
+                errorMessage = errorMessages.join(', ');
+            } else if (error.response?.data?.message) {
+                errorMessage = error.response.data.message;
+            }
+
             // Set form error
-            setFormError(error.response?.data?.message || 'An error occurred while saving the product');
+            setFormError(errorMessage);
 
             // Show error notification
             setNotification({
                 show: true,
-                message: error.response?.data?.message || 'Failed to save product',
+                message: errorMessage,
                 type: 'error'
             });
 
@@ -323,7 +346,7 @@ const ProductsCards = () => {
         <div className="w-full">
             {/* Header with search, categories, and add button */}
             <div className="mb-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-                <div className="flex flex-col md:flex-row gap-4 items-start md:items-center">
+                <div className="flex items-center">
                     <div className="relative">
                         <input
                             type="text"
@@ -333,30 +356,24 @@ const ProductsCards = () => {
                         />
                         <Search className="absolute left-3 top-2.5 text-gray-400" size={18} />
                     </div>
-
-                    <div className="flex flex-wrap gap-2">
-                        {categories.map((category) => (
-                            <button
-                                key={category}
-                                onClick={() => handleCategoryChange(category)}
-                                className={`px-3 py-1 rounded-full text-sm font-medium transition-colors ${
-                                    selectedCategory === category
-                                        ? 'bg-black text-white'
-                                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                                }`}
-                            >
-                                {category}
-                            </button>
-                        ))}
-                    </div>
                 </div>
 
                 <button
                     className="bg-black hover:bg-gray-900 text-white rounded-lg px-5 py-2 font-semibold flex items-center gap-2 shadow transition"
                     onClick={handleAdd}
+                    disabled={isSubmitting}
                 >
-                    <Plus size={18} />
-                    <span>Add Product</span>
+                    {isSubmitting ? (
+                        <>
+                            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                            <span>Processing...</span>
+                        </>
+                    ) : (
+                        <>
+                            <Plus size={18} />
+                            <span>Add Product</span>
+                        </>
+                    )}
                 </button>
             </div>
 
@@ -394,18 +411,20 @@ const ProductsCards = () => {
                                     animate={{ opacity: 1, scale: 1 }}
                                     exit={{ opacity: 0, scale: 0.9 }}
                                     transition={{ duration: 0.3 }}
-                                    className="w-full max-w-[280px] bg-white rounded-xl shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden flex flex-col h-full border border-gray-100 relative"
+                                    className="w-full max-w-[280px] bg-white rounded-xl shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden flex flex-col h-full border border-gray-100 relative hover:border-gray-300"
                                 >
                                     {/* Product Image Container */}
-                                    <div className="relative w-full p-4 bg-gray-50">
-                                        <div className="relative h-36 overflow-hidden rounded-lg flex items-center justify-center">
+                                    <div className="relative w-full pt-4 px-4">
+                                        <div className="relative h-36 overflow-hidden flex items-center justify-center">
                                             <img
-                                                src={product.image_url || 'https://via.placeholder.com/200'}
+                                                src={product.image_url && !product.image_url.includes('imgs.search.brave.com')
+                                                    ? product.image_url
+                                                    : '/placeholder-image.svg'}
                                                 alt={product.name}
                                                 className="h-auto transition-transform duration-500 hover:scale-105"
-                                                style={{ width: '200px', height: '200px', objectFit: 'contain' }}
+                                                style={{ width: '140px', height: '140px', objectFit: 'contain' }}
                                                 onError={(e) => {
-                                                    e.target.src = 'https://via.placeholder.com/200';
+                                                    e.target.src = '/placeholder-image.svg';
                                                 }}
                                             />
                                         </div>
@@ -421,55 +440,56 @@ const ProductsCards = () => {
                                     </div>
 
                                     {/* Product Content */}
-                                    <div className="p-5 flex flex-col flex-grow">
-                                        {/* Product Name */}
-                                        <h3 className="font-bold text-sm text-gray-800 mb-2 leading-tight line-clamp-2 h-10">
-                                            {product.name}
-                                        </h3>
-
-                                        {/* Product Description */}
-                                        <p className="text-gray-600 text-xs mb-3 line-clamp-2 flex-grow">
-                                            {product.description || 'No description available.'}
-                                        </p>
-
-                                        {/* Category */}
+                                    <div className="p-4 flex flex-col flex-grow">
+                                        {/* Category Tag */}
                                         {product.category && (
-                                            <div className="mb-3">
-                                                <span className="px-2 py-1 rounded-md text-xs font-medium bg-gray-100 text-gray-700">
+                                            <div className="mb-2">
+                                                <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-700">
                                                     {product.category}
                                                 </span>
                                             </div>
                                         )}
 
+                                        {/* Product Name */}
+                                        <h3 className="font-bold text-sm text-gray-800 mb-1 leading-tight line-clamp-2 h-10">
+                                            {product.name}
+                                        </h3>
+
+                                        {/* Product Description */}
+                                        <p className="text-gray-500 text-xs mb-2 line-clamp-2 flex-grow">
+                                            {product.description || 'No description available.'}
+                                        </p>
+
                                         {/* Stock */}
-                                        <div className="mb-2 text-xs text-gray-500">
+                                        <div className="text-xs text-gray-500 mb-3">
                                             Stock: {product.stock_quantity || 0} units
                                         </div>
 
-                                        {/* Price */}
-                                        <div className="mt-auto pt-3 border-t border-gray-100 flex justify-between items-center">
+                                        {/* Price and Actions */}
+                                        <div className="mt-auto flex justify-between items-center">
+                                            {/* Price */}
                                             <div className="font-bold text-lg text-gray-800 tracking-tight">
-                                                ${product.price}
+                                                ${Number(product.price).toFixed(2)}
                                             </div>
 
                                             {/* Action buttons */}
-                                            <div className="flex space-x-1">
+                                            <div className="flex space-x-1 bg-gray-50 rounded-lg p-1">
                                                 <button
-                                                    className="p-1.5 rounded-full text-gray-400 hover:text-blue-600 hover:bg-blue-50 transition-colors"
+                                                    className="p-1.5 rounded-md text-gray-500 hover:text-blue-600 hover:bg-blue-50 transition-colors"
                                                     onClick={() => handleView(product)}
                                                     title="View"
                                                 >
                                                     <Eye size={16} />
                                                 </button>
                                                 <button
-                                                    className="p-1.5 rounded-full text-gray-400 hover:text-green-600 hover:bg-green-50 transition-colors"
+                                                    className="p-1.5 rounded-md text-gray-500 hover:text-green-600 hover:bg-green-50 transition-colors"
                                                     onClick={() => handleEdit(product)}
                                                     title="Edit"
                                                 >
                                                     <Edit size={16} />
                                                 </button>
                                                 <button
-                                                    className="p-1.5 rounded-full text-gray-400 hover:text-red-600 hover:bg-red-50 transition-colors"
+                                                    className="p-1.5 rounded-md text-gray-500 hover:text-red-600 hover:bg-red-50 transition-colors"
                                                     onClick={() => handleDeleteClick(product)}
                                                     title="Delete"
                                                 >
@@ -556,7 +576,9 @@ const ProductsCards = () => {
                         </h3>
                         <form onSubmit={handleFormSubmit}>
                             <div className="mb-4">
-                                <label className="block text-gray-700 font-semibold mb-2">Name</label>
+                                <label className="block text-gray-700 font-semibold mb-2">
+                                    Name <span className="text-red-500">*</span>
+                                </label>
                                 <input
                                     type="text"
                                     name="name"
@@ -564,8 +586,11 @@ const ProductsCards = () => {
                                     onChange={handleInputChange}
                                     className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
                                     required
+                                    maxLength={100}
                                     disabled={modalType === 'view'}
+                                    placeholder="Enter product name"
                                 />
+                                <p className="text-xs text-gray-500 mt-1">Maximum 100 characters</p>
                             </div>
                             <div className="mb-4">
                                 <label className="block text-gray-700 font-semibold mb-2">Description</label>
@@ -576,11 +601,14 @@ const ProductsCards = () => {
                                     className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
                                     rows="3"
                                     disabled={modalType === 'view'}
+                                    placeholder="Enter product description"
                                 ></textarea>
                             </div>
                             <div className="grid grid-cols-2 gap-4 mb-4">
                                 <div>
-                                    <label className="block text-gray-700 font-semibold mb-2">Price ($)</label>
+                                    <label className="block text-gray-700 font-semibold mb-2">
+                                        Price ($) <span className="text-red-500">*</span>
+                                    </label>
                                     <input
                                         type="number"
                                         name="price"
@@ -591,6 +619,7 @@ const ProductsCards = () => {
                                         step="0.01"
                                         required
                                         disabled={modalType === 'view'}
+                                        placeholder="0.00"
                                     />
                                 </div>
                                 <div>
@@ -604,6 +633,7 @@ const ProductsCards = () => {
                                         min="0"
                                         step="0.01"
                                         disabled={modalType === 'view'}
+                                        placeholder="0.00"
                                     />
                                 </div>
                             </div>
@@ -618,18 +648,25 @@ const ProductsCards = () => {
                                         className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
                                         min="0"
                                         disabled={modalType === 'view'}
+                                        placeholder="0"
                                     />
                                 </div>
                                 <div>
                                     <label className="block text-gray-700 font-semibold mb-2">Category</label>
-                                    <input
-                                        type="text"
+                                    <select
                                         name="category"
                                         value={formData.category}
                                         onChange={handleInputChange}
                                         className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
                                         disabled={modalType === 'view'}
-                                    />
+                                    >
+                                        <option value="">Select a category</option>
+                                        <option value="Supplements">Supplements</option>
+                                        <option value="Apparel">Apparel</option>
+                                        <option value="Equipment">Equipment</option>
+                                        <option value="Accessories">Accessories</option>
+                                        <option value="Nutrition">Nutrition</option>
+                                    </select>
                                 </div>
                             </div>
                             <div className="mb-4">
@@ -641,7 +678,34 @@ const ProductsCards = () => {
                                     onChange={handleInputChange}
                                     className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
                                     disabled={modalType === 'view'}
+                                    placeholder="https://example.com/image.jpg"
+                                    maxLength={255}
                                 />
+                                {formData.image_url && formData.image_url.includes('imgs.search.brave.com') && (
+                                    <p className="text-red-500 text-xs mt-1">
+                                        Warning: Brave search image URLs are not supported. Please use a direct image URL.
+                                    </p>
+                                )}
+                                <p className="text-xs text-gray-500 mt-1">Maximum 255 characters</p>
+
+                                {/* Image Preview */}
+                                {formData.image_url && !formData.image_url.includes('imgs.search.brave.com') && (
+                                    <div className="mt-2 border rounded-lg p-2 flex justify-center">
+                                        <img
+                                            src={formData.image_url}
+                                            alt="Product preview"
+                                            className="h-24 object-contain"
+                                            onError={(e) => {
+                                                e.target.src = '/placeholder-image.svg';
+                                                e.target.nextSibling =
+                                                    <p className="text-red-500 text-xs">Image URL is invalid or inaccessible</p>;
+                                            }}
+                                        />
+                                    </div>
+                                )}
+                            </div>
+                            <div className="mb-4">
+                                <input type="hidden" name="gym_id" value={formData.gym_id} />
                             </div>
                             <div className="mb-6 flex items-center">
                                 <input
