@@ -14,12 +14,13 @@ const OverviewPage = () => {
     <div className='flex-1 overflow-auto relative z-10'>
       <Header title='Overview' />
       <motion.div
-        className=' max-w-7xl mx-auto py-6 px-4 lg:px-8'
+        className='max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8'
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 1 }}
+        transition={{ duration: 0.5 }}
       >
-        <div className='grid grid-cols-1 lg:grid-cols-2 gap-3'>
+        {/* Message Cards Section */}
+        <div className='grid grid-cols-1 md:grid-cols-2 gap-4 mb-6'>
           <MessageCards
             type="quote"
             icon={Zap}
@@ -36,11 +37,21 @@ const OverviewPage = () => {
             eventType="Class"
           />
         </div>
-        <StatCards />
-        <div className="grid grid-cols-3 gap-3 mt-4 sm:grid-cols-2 lg:grid-cols-3 mb-8 xl:grid-cols-3">
-          <MyCalendar />
-          <GymEvents />
-          <StaffAttendance />
+
+        {/* Stats Section */}
+        <div className="mb-6">
+          <StatCards />
+        </div>
+        <div className="grid grid-cols-1 gap-4 mt-6 md:grid-cols-2 xl:grid-cols-3 mb-8">
+          <div className="h-full">
+            <MyCalendar />
+          </div>
+          <div className="h-full">
+            <GymEvents />
+          </div>
+          <div className="h-full md:col-span-2 xl:col-span-1">
+            <StaffAttendance />
+          </div>
         </div>
       </motion.div>
     </div>

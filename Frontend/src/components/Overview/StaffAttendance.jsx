@@ -14,13 +14,13 @@ const roleColors = {
 
 const StaffAttendance = () => {
   return (
-    <div className="bg-white rounded-2xl border border-gray-200 p-6 min-w-[180px] max-w-xs">
+    <div className="bg-white rounded-2xl border border-gray-200 p-4 sm:p-6 w-full h-full">
       <h2 className="text-lg font-bold text-gray-800 mb-3 tracking-tight">Staff Attendance</h2>
       <div className="flex flex-col gap-3">
         {staffToday.map(staff => (
-          <div key={staff.id} className="flex items-center gap-3 bg-gray-100 rounded-lg border border-gray-100 p-3">
-            <span className="block text-base font-medium text-gray-900 min-w-[90px]">{staff.name}</span>
-            <div className="flex flex-col items-end gap-1 ml-auto">
+          <div key={staff.id} className="flex flex-wrap sm:flex-nowrap items-center gap-2 sm:gap-3 bg-gray-100 rounded-lg border border-gray-100 p-3">
+            <span className="block text-base font-medium text-gray-900 min-w-0 sm:min-w-[90px] mb-1 sm:mb-0">{staff.name}</span>
+            <div className="flex flex-row sm:flex-col items-center sm:items-end gap-2 sm:gap-1 ml-auto w-full sm:w-auto justify-between">
               <div className={`px-2 py-1 rounded text-xs font-semibold border ${roleColors[staff.role]} border-opacity-30 border-gray-300 w-20 text-center`}>
                 {staff.role}
               </div>
