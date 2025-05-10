@@ -2,10 +2,38 @@ import { motion } from "framer-motion";
 import { DollarSign, Users, ShoppingBag, Eye, ArrowDownRight, ArrowUpRight } from "lucide-react";
 
 const overviewData = [
-	{ name: "Revenue", value: "$1,288,539", change: 12.5, icon: DollarSign },
-	{ name: "Users", value: "58", change: 8.3, icon: Users },
-	{ name: "Orders", value: "9,879", change: -3.2, icon: ShoppingBag },
-	{ name: "Page Views", value: "1,235", change: 15.7, icon: Eye },
+	{
+		name: "Total Members",
+		value: "248",
+		change: 5.2,
+		icon: Users,
+		bgColor: "bg-gradient-to-br from-blue-50 to-blue-100",
+		iconColor: "text-blue-500"
+	},
+	{
+		name: "Monthly Revenue",
+		value: "$28,459",
+		change: 12.3,
+		icon: DollarSign,
+		bgColor: "bg-gradient-to-br from-emerald-50 to-emerald-100",
+		iconColor: "text-emerald-500"
+	},
+	{
+		name: "Profit Margin",
+		value: "32.8%",
+		change: -2.4,
+		icon: ShoppingBag,
+		bgColor: "bg-gradient-to-br from-purple-50 to-purple-100",
+		iconColor: "text-purple-500"
+	},
+	{
+		name: "Class Attendance",
+		value: "89%",
+		change: 3.7,
+		icon: Eye,
+		bgColor: "bg-gradient-to-br from-amber-50 to-amber-100",
+		iconColor: "text-amber-500"
+	},
 ];
 
 const StatCards = () => {

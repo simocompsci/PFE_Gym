@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-  Search, Plus, Trash2, Eye, X, AlertCircle, Check, Edit
+    Search, Plus, Trash2, Eye, X, AlertCircle, Check, Edit
 } from 'lucide-react';
 import { productService } from '../../lib/api';
 
@@ -345,14 +345,13 @@ const ProductsCards = () => {
     return (
         <div className="w-full">
             {/* Header with search, categories, and add button */}
-            <div className="mb-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+            <div className="my-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                 <div className="flex items-center">
                     <div className="relative">
                         <input
                             type="text"
                             placeholder="Search Products..."
-                            className="bg-gray-100 text-black placeholder-gray-400 rounded-lg pl-10 pr-4 py-2 focus:outline-none focus:ring-2 focus:ring-gray-500"
-                            onChange={handleSearch}
+                            className="bg-gray-200 bg-opacity-15 text-black placeholder-gray-400 rounded-lg pl-10 pr-4 py-2 focus:outline-none focus:ring-2 focus:ring-gray-500" onChange={handleSearch}
                         />
                         <Search className="absolute left-3 top-2.5 text-gray-400" size={18} />
                     </div>
@@ -431,9 +430,8 @@ const ProductsCards = () => {
 
                                         {/* Status badge */}
                                         <div className="absolute top-2 right-2">
-                                            <span className={`px-2 py-1 rounded-full text-xs font-semibold ${
-                                                product.is_active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
-                                            }`}>
+                                            <span className={`px-2 py-1 rounded-full text-xs font-semibold ${product.is_active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                                                }`}>
                                                 {product.is_active ? 'Active' : 'Inactive'}
                                             </span>
                                         </div>
@@ -546,10 +544,9 @@ const ProductsCards = () => {
 
             {/* Notification Toast */}
             {notification.show && (
-                <div className={`fixed bottom-4 right-4 px-6 py-3 rounded-lg shadow-lg flex items-center z-50 ${
-                    notification.type === 'success' ? 'bg-green-100 text-green-800 border border-green-200' :
-                    'bg-red-100 text-red-800 border border-red-200'
-                }`}>
+                <div className={`fixed bottom-4 right-4 px-6 py-3 rounded-lg shadow-lg flex items-center z-50 ${notification.type === 'success' ? 'bg-green-100 text-green-800 border border-green-200' :
+                        'bg-red-100 text-red-800 border border-red-200'
+                    }`}>
                     {notification.type === 'success' ? (
                         <Check className="mr-2" size={20} />
                     ) : (
