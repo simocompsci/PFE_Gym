@@ -58,7 +58,12 @@ export function ProfitMarginChart() {
             />
             <ChartTooltip
               cursor={false}
-              content={<ChartTooltipContent hideLabel />}
+              content={
+                <ChartTooltipContent
+                  hideLabel
+                  className="bg-white text-gray-800 shadow-lg border border-gray-100"
+                />
+              }
             />
             <Line
               dataKey="margin"

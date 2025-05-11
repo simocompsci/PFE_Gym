@@ -59,7 +59,12 @@ export function MembershipStatsChart() {
           <PieChart>
             <ChartTooltip
               cursor={false}
-              content={<ChartTooltipContent hideLabel />}
+              content={
+                <ChartTooltipContent
+                  hideLabel
+                  className="bg-white text-gray-800 shadow-lg border border-gray-100"
+                />
+              }
             />
             <Pie
               data={chartData}

@@ -49,7 +49,12 @@ export function MemberdemgrChart() {
             />
             <ChartTooltip
               cursor={false}
-              content={<ChartTooltipContent hideLabel />}
+              content={
+                <ChartTooltipContent
+                  hideLabel
+                  className="bg-white text-gray-800 shadow-lg border border-gray-100"
+                />
+              }
             />
             <Bar dataKey="members" fill="#3b82f6" radius={8} />
           </BarChart>

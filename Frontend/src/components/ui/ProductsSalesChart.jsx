@@ -58,7 +58,12 @@ export function ProductsSalesChart() {
             />
             <ChartTooltip
               cursor={false}
-              content={<ChartTooltipContent hideLabel />}
+              content={
+                <ChartTooltipContent
+                  hideLabel
+                  className="bg-white text-gray-800 shadow-lg border border-gray-100"
+                />
+              }
             />
             <Bar dataKey="sales" fill="#10b981" radius={5} />
           </BarChart>
