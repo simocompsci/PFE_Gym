@@ -1,4 +1,3 @@
-
 import { TrendingUp } from "lucide-react"
 import { CartesianGrid, Line, LineChart, XAxis } from "recharts"
 
@@ -15,7 +14,9 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart"
-const chartData = [
+
+// Default data if API data is not available yet
+const defaultChartData = [
   { month: "January", margin: 28.4 },
   { month: "February", margin: 31.2 },
   { month: "March", margin: 29.8 },
@@ -31,7 +32,26 @@ const chartConfig = {
   },
 }
 
-export function ProfitMarginChart() {
+export function ProfitMarginChart({ data }) {
+  // Use provided data or fall back to default
+  const chartData = data || defaultChartData;
+  
+  // Get current margin (last month in data)
+  const getCurrentMargin = () => {
+    if (!chartData || chartData.length === 0) return 0;
+    return chartData[chartData.length - 1].margin;
+  };
+  
+  // Calculate average margin
+  const getAverageMargin = () => {
+    if (!chartData || chartData.length === 0) return 0;
+    const total = chartData.reduce((sum, month) => sum + month.margin, 0);
+    return (total / chartData.length).toFixed(1);
+  };
+  
+  const currentMargin = getCurrentMargin();
+  const averageMargin = getAverageMargin();
+
   return (
     <Card>
       <CardHeader>
@@ -82,10 +102,10 @@ export function ProfitMarginChart() {
       </CardContent>
       <CardFooter className="flex-col items-start gap-2 text-sm">
         <div className="flex gap-2 font-medium leading-none">
-          Current margin: 32.8% <TrendingUp className="h-4 w-4 text-purple-500" />
+          Current margin: {currentMargin}% <TrendingUp className="h-4 w-4 text-purple-500" />
         </div>
         <div className="leading-none text-muted-foreground">
-          Average margin: 31.1% over the last 6 months
+          Average margin: {averageMargin}% over the last 6 months
         </div>
       </CardFooter>
     </Card>

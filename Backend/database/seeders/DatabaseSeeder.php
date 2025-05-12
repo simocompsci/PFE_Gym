@@ -24,5 +24,9 @@ class DatabaseSeeder extends Seeder
 
         // Create clients with memberships
         $this->call(ClientSeeder::class);
+        $this->call(ClassSeeder::class);
+        $this->call(ProductSeeder::class);
+
+
     }
 }

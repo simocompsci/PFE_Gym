@@ -1,4 +1,3 @@
-
 import { TrendingUp } from "lucide-react"
 import { Bar, BarChart, XAxis, YAxis } from "recharts"
 
@@ -15,7 +14,9 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart"
-const chartData = [
+
+// Default data if API data is not available yet
+const defaultChartData = [
   { product: "Protein Powder", sales: 124 },
   { product: "Fitness Bands", sales: 98 },
   { product: "Gym Gloves", sales: 85 },
@@ -30,7 +31,27 @@ const chartConfig = {
   },
 }
 
-export function ProductsSalesChart() {
+export function ProductsSalesChart({ data }) {
+  // Use provided data or fall back to default
+  const chartData = data || defaultChartData;
+  
+  // Find top selling product
+  const getTopProduct = () => {
+    if (!chartData || chartData.length === 0) return "None";
+    
+    return chartData.reduce((max, current) => 
+      current.sales > max.sales ? current : max, chartData[0]).product;
+  };
+  
+  // Calculate total sales
+  const getTotalSales = () => {
+    if (!chartData) return 0;
+    return chartData.reduce((sum, product) => sum + product.sales, 0);
+  };
+  
+  const topProduct = getTopProduct();
+  const totalSales = getTotalSales();
+
   return (
     <Card>
       <CardHeader>
@@ -71,10 +92,10 @@ export function ProductsSalesChart() {
       </CardContent>
       <CardFooter className="flex-col items-start gap-2 text-sm">
         <div className="flex gap-2 font-medium leading-none">
-          Protein powder is the best seller <TrendingUp className="h-4 w-4 text-emerald-500" />
+          {topProduct} is the best seller <TrendingUp className="h-4 w-4 text-emerald-500" />
         </div>
         <div className="leading-none text-muted-foreground">
-          Total of 445 units sold this month
+          Total of {totalSales} units sold this month
         </div>
       </CardFooter>
     </Card>

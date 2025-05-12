@@ -1,4 +1,3 @@
-
 import { TrendingUp } from "lucide-react"
 import { Bar, BarChart, CartesianGrid, XAxis } from "recharts"
 
@@ -15,7 +14,9 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart"
-const chartData = [
+
+// Default data if API data is not available yet
+const defaultChartData = [
   { ageGroup: "18-24", members: 42 },
   { ageGroup: "25-34", members: 78 },
   { ageGroup: "35-44", members: 65 },
@@ -30,7 +31,27 @@ const chartConfig = {
   },
 }
 
-export function MemberdemgrChart() {
+export function MemberdemgrChart({ data }) {
+  // Use provided data or fall back to default
+  const chartData = data || defaultChartData;
+  
+  // Find the age group with most members
+  const getLargestGroup = () => {
+    if (!chartData || chartData.length === 0) return "None";
+    
+    return chartData.reduce((max, current) => 
+      current.members > max.members ? current : max, chartData[0]).ageGroup;
+  };
+  
+  // Calculate total members
+  const getTotalMembers = () => {
+    if (!chartData) return 0;
+    return chartData.reduce((sum, group) => sum + group.members, 0);
+  };
+  
+  const largestGroup = getLargestGroup();
+  const totalMembers = getTotalMembers();
+
   return (
     <Card>
       <CardHeader>
@@ -62,10 +83,10 @@ export function MemberdemgrChart() {
       </CardContent>
       <CardFooter className="flex-col items-start gap-2 text-sm">
         <div className="flex gap-2 font-medium leading-none">
-          25-34 age group is the largest segment <TrendingUp className="h-4 w-4 text-blue-500" />
+          {largestGroup} age group is the largest segment <TrendingUp className="h-4 w-4 text-blue-500" />
         </div>
         <div className="leading-none text-muted-foreground">
-          Total of 248 members across all age groups
+          Total of {totalMembers} members across all age groups
         </div>
       </CardFooter>
     </Card>

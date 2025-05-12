@@ -1,42 +1,54 @@
 import { motion } from "framer-motion";
 import { DollarSign, Users, ShoppingBag, Eye, ArrowDownRight, ArrowUpRight } from "lucide-react";
 
-const overviewData = [
-	{
-		name: "Total Members",
-		value: "248",
-		change: 5.2,
-		icon: Users,
-		bgColor: "bg-gradient-to-br from-blue-50 to-blue-100",
-		iconColor: "text-blue-500"
-	},
-	{
-		name: "Monthly Revenue",
-		value: "$28,459",
-		change: 12.3,
-		icon: DollarSign,
-		bgColor: "bg-gradient-to-br from-emerald-50 to-emerald-100",
-		iconColor: "text-emerald-500"
-	},
-	{
-		name: "Profit Margin",
-		value: "32.8%",
-		change: -2.4,
-		icon: ShoppingBag,
-		bgColor: "bg-gradient-to-br from-purple-50 to-purple-100",
-		iconColor: "text-purple-500"
-	},
-	{
-		name: "Class Attendance",
-		value: "89%",
-		change: 3.7,
-		icon: Eye,
-		bgColor: "bg-gradient-to-br from-amber-50 to-amber-100",
-		iconColor: "text-amber-500"
-	},
-];
+const StatCards = ({ stats }) => {
+	// If no stats are provided yet, use placeholder data
+	const dashboardStats = stats || {
+		totalMembers: 248,
+		memberChange: 5.2,
+		monthlyRevenue: 28459,
+		revenueChange: 12.3,
+		profitMargin: 32.8,
+		profitMarginChange: -2.4,
+		attendanceRate: 89,
+		attendanceChange: 3.7
+	};
 
-const StatCards = () => {
+	const overviewData = [
+		{
+			name: "Total Members",
+			value: dashboardStats.totalMembers,
+			change: dashboardStats.memberChange,
+			icon: Users,
+			bgColor: "bg-gradient-to-br from-blue-50 to-blue-100",
+			iconColor: "text-blue-500"
+		},
+		{
+			name: "Monthly Revenue",
+			value: `$${dashboardStats.monthlyRevenue?.toLocaleString() || '0'}`,
+			change: dashboardStats.revenueChange,
+			icon: DollarSign,
+			bgColor: "bg-gradient-to-br from-emerald-50 to-emerald-100",
+			iconColor: "text-emerald-500"
+		},
+		{
+			name: "Profit Margin",
+			value: `${dashboardStats.profitMargin}%`,
+			change: dashboardStats.profitMarginChange,
+			icon: ShoppingBag,
+			bgColor: "bg-gradient-to-br from-purple-50 to-purple-100",
+			iconColor: "text-purple-500"
+		},
+		{
+			name: "Class Attendance",
+			value: `${dashboardStats.attendanceRate}%`,
+			change: dashboardStats.attendanceChange,
+			icon: Eye,
+			bgColor: "bg-gradient-to-br from-amber-50 to-amber-100",
+			iconColor: "text-amber-500"
+		},
+	];
+
 	return (
 		<div className='grid grid-cols-1 gap-3 mt-4 sm:grid-cols-2 lg:grid-cols-4 mb-8'>
 			{overviewData.map((item, index) => (

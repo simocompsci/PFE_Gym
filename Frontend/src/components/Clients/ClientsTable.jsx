@@ -539,9 +539,9 @@ const ClientsTable = () => {
                                                 </td>
                                                 <td className="px-2 py-2 whitespace-nowrap text-sm font-medium text-gray-900 rounded-r-xl">
                                                     <button
-                                                        className='text-gray-400 hover:text-blue-600 p-2 rounded-full transition-colors duration-150'
+                                                        className="p-2 rounded-full transition-colors bg-gray-50 hover:bg-blue-100 text-blue-600 hover:text-blue-800"
                                                         onClick={() => handleView(client)}
-                                                        title="View"
+                                                        title="Show Info"
                                                     >
                                                         <span className="sr-only">View</span>
                                                         <Eye size={18} />
@@ -686,21 +686,17 @@ const ClientsTable = () => {
                 </div>
             )}
 
-            {/* Modal for Add/Edit/View */}
-            {showModal && (
+            {/* Modal for Add/Edit */}
+            {showModal && (modalType === 'add' || modalType === 'edit') && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-60 backdrop-blur-sm transition-opacity duration-300 p-2 sm:p-4 overflow-hidden">
                     <div className="bg-white rounded-xl shadow-2xl w-full max-w-md mx-auto my-auto transform transition-all duration-300 scale-100 opacity-100 max-h-[95vh] sm:max-h-[90vh] flex flex-col">
                         {/* Header with gradient background */}
                         <div className="bg-gradient-to-r from-blue-600 to-indigo-700 rounded-t-xl p-6 text-white relative">
                             <h2 className="text-2xl font-bold">
-                                {modalType === 'add' && 'Add Client'}
-                                {modalType === 'edit' && 'Edit Client'}
-                                {modalType === 'view' && 'Client Details'}
+                                {modalType === 'add' ? 'Add Client' : 'Edit Client'}
                             </h2>
                             <p className="text-blue-100 mt-1 text-sm">
-                                {modalType === 'add' && 'Fill in the information below to add a new client'}
-                                {modalType === 'edit' && 'Update the client information below'}
-                                {modalType === 'view' && 'View client information'}
+                                {modalType === 'add' ? 'Fill in the information below to add a new client' : 'Update the client information below'}
                             </p>
                             <button
                                 onClick={() => setShowModal(false)}
@@ -730,7 +726,6 @@ const ClientsTable = () => {
                                             className="w-full pl-10 pr-3 py-2.5 border rounded-lg text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors border-gray-300"
                                             placeholder="John"
                                             required
-                                            disabled={modalType === 'view'}
                                         />
                                     </div>
                                 </div>
@@ -751,7 +746,6 @@ const ClientsTable = () => {
                                             className="w-full pl-10 pr-3 py-2.5 border rounded-lg text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors border-gray-300"
                                             placeholder="Doe"
                                             required
-                                            disabled={modalType === 'view'}
                                         />
                                     </div>
                                 </div>
@@ -773,7 +767,6 @@ const ClientsTable = () => {
                                         onChange={handleInputChange}
                                         className="w-full pl-10 pr-3 py-2.5 border rounded-lg text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors border-gray-300"
                                         placeholder="john.doe@example.com"
-                                        disabled={modalType === 'view'}
                                     />
                                 </div>
                             </div>
@@ -795,7 +788,6 @@ const ClientsTable = () => {
                                         className="w-full pl-10 pr-3 py-2.5 border rounded-lg text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors border-gray-300"
                                         placeholder="+1 (555) 123-4567"
                                         required
-                                        disabled={modalType === 'view'}
                                     />
                                 </div>
                             </div>
@@ -814,7 +806,6 @@ const ClientsTable = () => {
                                         value={formData.membership}
                                         onChange={handleInputChange}
                                         className="w-full pl-10 pr-3 py-2.5 border border-gray-300 rounded-lg text-gray-700 appearance-none bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors"
-                                        disabled={modalType === 'view'}
                                     >
                                         <option value="Gold">Gold</option>
                                         <option value="Silver">Silver</option>
@@ -837,7 +828,6 @@ const ClientsTable = () => {
                                     checked={formData.is_active}
                                     onChange={handleInputChange}
                                     className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
-                                    disabled={modalType === 'view'}
                                 />
                                 <label htmlFor="is_active" className="ml-2 text-sm font-medium text-gray-700">
                                     Active Client
@@ -863,26 +853,66 @@ const ClientsTable = () => {
                                 className="px-5 py-2.5 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-300 transition-colors"
                                 disabled={isSubmitting}
                             >
-                                {modalType === 'view' ? 'Close' : 'Cancel'}
+                                Cancel
                             </button>
 
-                            {modalType !== 'view' && (
-                                <button
-                                    form="client-form"
-                                    type="submit"
-                                    disabled={isSubmitting}
-                                    className="px-5 py-2.5 text-sm font-medium text-white bg-black rounded-lg hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors disabled:opacity-50 flex items-center justify-center min-w-[100px]"
-                                >
-                                    {isSubmitting ? (
-                                        <>
-                                            <Loader2 size={16} className="animate-spin mr-2" />
-                                            <span>{modalType === 'add' ? 'Adding...' : 'Saving...'}</span>
-                                        </>
-                                    ) : (
-                                        <span>{modalType === 'add' ? 'Add Client' : 'Save Changes'}</span>
-                                    )}
-                                </button>
-                            )}
+                            <button
+                                form="client-form"
+                                type="submit"
+                                disabled={isSubmitting}
+                                className="px-5 py-2.5 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors disabled:opacity-50 flex items-center justify-center min-w-[100px]"
+                            >
+                                {isSubmitting ? (
+                                    <>
+                                        <Loader2 size={16} className="animate-spin mr-2" />
+                                        <span>{modalType === 'add' ? 'Adding...' : 'Saving...'}</span>
+                                    </>
+                                ) : (
+                                    <span>{modalType === 'add' ? 'Add Client' : 'Save Changes'}</span>
+                                )}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* View Client Details Modal */}
+            {showModal && modalType === 'view' && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-60 backdrop-blur-sm transition-opacity duration-300 p-2 sm:p-4 overflow-hidden">
+                    <div className="bg-white rounded-xl shadow-xl w-full max-w-md relative overflow-hidden">
+                        <div className="bg-gradient-to-r from-blue-600 to-indigo-700 p-6 text-white">
+                            <h2 className="text-xl font-bold">Client Details</h2>
+                            <button
+                                className="absolute top-4 right-4 text-white hover:text-blue-200 focus:outline-none transition-colors"
+                                onClick={() => setShowModal(false)}
+                            >
+                                <X size={24} />
+                            </button>
+                        </div>
+                        <div className="p-6">
+                            <div className="mb-3"><span className="font-semibold text-gray-700">Name:</span> <span className="text-gray-900">{formData.first_name} {formData.last_name}</span></div>
+                            <div className="mb-3"><span className="font-semibold text-gray-700">Email:</span> <span className="text-gray-900">{formData.email || 'Not provided'}</span></div>
+                            <div className="mb-3"><span className="font-semibold text-gray-700">Phone:</span> <span className="text-gray-900">{formData.phone}</span></div>
+                            <div className="mb-3">
+                                <span className="font-semibold text-gray-700">Membership:</span>
+                                <span className={`ml-2 px-2 py-1 rounded-full text-xs font-semibold ${
+                                    formData.membership === 'Gold' ? 'bg-yellow-100 text-yellow-800 border border-yellow-200' :
+                                    formData.membership === 'Silver' ? 'bg-gray-100 text-gray-700 border border-gray-200' :
+                                    'bg-orange-100 text-orange-700 border border-orange-200'
+                                }`}>
+                                    {formData.membership}
+                                </span>
+                            </div>
+                            <div className="mb-3">
+                                <span className="font-semibold text-gray-700">Status:</span>
+                                <span className={`ml-2 px-2 py-1 rounded-full text-xs font-semibold ${formData.is_active ? 'bg-green-100 text-green-800 border border-green-200' : 'bg-red-100 text-red-800 border border-red-200'}`}>
+                                    {formData.is_active ? 'Active' : 'Inactive'}
+                                </span>
+                            </div>
+                            <div className="flex gap-3 mt-6">
+                                <button className="flex-1 px-4 py-2.5 rounded-lg bg-blue-600 text-white font-semibold hover:bg-blue-700 transition" onClick={() => { setShowModal(false); handleEdit({id: formData.id, name: `${formData.first_name} ${formData.last_name}`, email: formData.email, phone: formData.phone, membership: formData.membership, active: formData.is_active}); }}>Edit</button>
+                                <button className="flex-1 px-4 py-2.5 rounded-lg bg-gray-200 text-gray-700 font-semibold hover:bg-gray-300 transition" onClick={() => setShowModal(false)}>Close</button>
+                            </div>
                         </div>
                     </div>
                 </div>

@@ -1,4 +1,3 @@
-
 import * as React from "react"
 import { TrendingUp } from "lucide-react"
 import { Label, Pie, PieChart } from "recharts"
@@ -16,10 +15,12 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart"
-const chartData = [
-  { plan: "gold", members: 85, fill: "#fbbf24" },
-  { plan: "silver", members: 112, fill: "#94a3b8" },
-  { plan: "bronze", members: 51, fill: "#b45309" },
+
+// Default data if API data is not available yet
+const defaultChartData = [
+  { plan: "Gold", members: 85, fill: "#fbbf24" },
+  { plan: "Silver", members: 112, fill: "#94a3b8" },
+  { plan: "Bronze", members: 51, fill: "#b45309" },
 ]
 
 const chartConfig = {
@@ -40,10 +41,13 @@ const chartConfig = {
   },
 }
 
-export function MembershipStatsChart() {
+export function MembershipStatsChart({ data }) {
+  // Use provided data or fall back to default
+  const chartData = data || defaultChartData;
+  
   const totalMembers = React.useMemo(() => {
     return chartData.reduce((acc, curr) => acc + curr.members, 0)
-  }, [])
+  }, [chartData])
 
   return (
     <Card className="flex flex-col">

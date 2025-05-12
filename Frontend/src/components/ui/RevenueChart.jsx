@@ -1,5 +1,3 @@
-
-
 import { TrendingUp } from "lucide-react"
 import { Area, AreaChart, CartesianGrid, XAxis } from "recharts"
 
@@ -16,7 +14,9 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart"
-const chartData = [
+
+// Default data if API data is not available yet
+const defaultChartData = [
   { month: "January", revenue: 18600, expenses: 12400 },
   { month: "February", revenue: 22500, expenses: 15200 },
   { month: "March", revenue: 19800, expenses: 13500 },
@@ -36,7 +36,22 @@ const chartConfig = {
   },
 }
 
-export function RevenueChart() {
+export function RevenueChart({ data }) {
+  // Use provided data or fall back to default
+  const chartData = data || defaultChartData;
+  
+  // Calculate percentage increase from previous month
+  const calculateIncrease = () => {
+    if (chartData.length < 2) return 0;
+    
+    const lastMonthRevenue = chartData[chartData.length - 1].revenue;
+    const previousMonthRevenue = chartData[chartData.length - 2].revenue;
+    
+    return ((lastMonthRevenue - previousMonthRevenue) / previousMonthRevenue * 100).toFixed(1);
+  };
+  
+  const increasePercentage = calculateIncrease();
+
   return (
     <Card>
       <CardHeader>
@@ -120,7 +135,7 @@ export function RevenueChart() {
         <div className="flex w-full items-start gap-2 text-sm">
           <div className="grid gap-2">
             <div className="flex items-center gap-2 font-medium leading-none">
-              Revenue increased by 12.3% this month <TrendingUp className="h-4 w-4 text-green-500" />
+              Revenue increased by {increasePercentage}% this month <TrendingUp className="h-4 w-4 text-green-500" />
             </div>
             <div className="flex items-center gap-2 leading-none text-muted-foreground">
               Last 6 months financial performance
