@@ -8,7 +8,6 @@ import { MembershipStatsChart } from '../components/ui/MembershipStatsChart';
 import { MemberdemgrChart } from '../components/ui/MemberdemgrChart';
 import { ProductsSalesChart } from '../components/ui/ProductsSalesChart';
 import { ProfitMarginChart } from '../components/ui/ProfitMarginChart';
-import analyticsService from '@/lib/services/analyticsService';
 import { toast } from 'react-hot-toast';
 
 const AnalyticsPage = () => {

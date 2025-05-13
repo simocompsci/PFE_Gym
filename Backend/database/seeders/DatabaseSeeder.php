@@ -25,7 +25,10 @@ class DatabaseSeeder extends Seeder
         // Create clients with memberships
         $this->call(ClientSeeder::class);
         $this->call(ClassSeeder::class);
+
+        // Create products and their sales data
         $this->call(ProductSeeder::class);
+        $this->call(ProductsSalesSeeder::class);
 
 
     }
