@@ -10,6 +10,7 @@ use App\Http\Controllers\StaffController;
 use App\Http\Controllers\ClientController;
 use App\Http\Controllers\ClassController;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\AnalyticsController;
 
 // Public routes
 Route::post('/login', [mutli_Auth_Controller::class, 'login']);
@@ -49,6 +50,14 @@ Route::middleware(['auth:sanctum', 'abilities:admin'])->prefix('admin')->group(f
     Route::delete('/products/{id}', [ProductController::class, 'deleteProduct']);
     Route::get('/product-categories', [ProductController::class, 'getCategories']);
 
+    // Analytics routes
+    Route::get('/analytics/revenue', [AnalyticsController::class, 'getRevenueData']);
+    Route::get('/analytics/membership', [AnalyticsController::class, 'getMembershipDistribution']);
+    Route::get('/analytics/age-distribution', [AnalyticsController::class, 'getAgeDistribution']);
+    Route::get('/analytics/product-sales', [AnalyticsController::class, 'getProductSales']);
+    Route::get('/analytics/profit-margins', [AnalyticsController::class, 'getProfitMargins']);
+
+
     // Other admin routes
 });
 
@@ -67,7 +76,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout', [mutli_Auth_Controller::class, 'logout']);
     Route::get('/user', [mutli_Auth_Controller::class, 'user']);
 });
-
 
 
 

@@ -1,7 +1,6 @@
-import * as React from "react"
-import { TrendingUp } from "lucide-react"
-import { Label, Pie, PieChart } from "recharts"
-
+import React, { useState, useEffect } from 'react'
+import { TrendingUp } from 'lucide-react'
+import { Label, Pie, PieChart } from 'recharts'
 import {
   Card,
   CardContent,
@@ -9,45 +8,79 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card"
+} from '@/components/ui/card'
 import {
   ChartContainer,
   ChartTooltip,
   ChartTooltipContent,
-} from "@/components/ui/chart"
+} from '@/components/ui/chart'
+import { analyticsService } from '@/lib/api'
 
-// Default data if API data is not available yet
-const defaultChartData = [
-  { plan: "Gold", members: 85, fill: "#fbbf24" },
-  { plan: "Silver", members: 112, fill: "#94a3b8" },
-  { plan: "Bronze", members: 51, fill: "#b45309" },
-]
-
+// Chart fill colors config
 const chartConfig = {
-  members: {
-    label: "Members",
-  },
-  gold: {
-    label: "Gold",
-    color: "#fbbf24", // Amber/gold color
-  },
-  silver: {
-    label: "Silver",
-    color: "#94a3b8", // Silver color
-  },
-  bronze: {
-    label: "Bronze",
-    color: "#b45309", // Bronze color
-  },
+  Gold: { color: '#fbbf24' },
+  Silver: { color: '#94a3b8' },
+  Bronze: { color: '#b45309' },
 }
 
-export function MembershipStatsChart({ data }) {
-  // Use provided data or fall back to default
-  const chartData = data || defaultChartData;
-  
-  const totalMembers = React.useMemo(() => {
-    return chartData.reduce((acc, curr) => acc + curr.members, 0)
-  }, [chartData])
+export function MembershipStatsChart() {
+  const [chartData, setChartData] = useState(null)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
+
+  useEffect(() => {
+    let isMounted = true
+    async function fetchData() {
+      try {
+        const response = await analyticsService.getMembershipDistribution()
+        // API returns { success: true, data: [...] }
+        const data = response.data.data
+        // add fill color based on plan
+        const formatted = data.map(item => ({
+          plan: item.plan,
+          members: item.members,
+          fill: chartConfig[item.plan]?.color || '#ccc',
+        }))
+        if (isMounted) setChartData(formatted)
+      } catch (err) {
+        console.error('Error fetching membership distribution:', err)
+        if (isMounted) setError('Unable to load membership stats.')
+      } finally {
+        if (isMounted) setLoading(false)
+      }
+    }
+    fetchData()
+    return () => { isMounted = false }
+  }, [])
+
+  // Render loading state
+  if (loading) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>Membership Distribution</CardTitle>
+        </CardHeader>
+        <CardContent className="py-10 text-center">Loading...</CardContent>
+      </Card>
+    )
+  }
+
+  // Render error state
+  if (error) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>Membership Distribution</CardTitle>
+        </CardHeader>
+        <CardContent className="py-10 text-center text-red-600">
+          {error}
+        </CardContent>
+      </Card>
+    )
+  }
+
+  // Calculate total members
+  const totalMembers = chartData.reduce((sum, { members }) => sum + members, 0)
 
   return (
     <Card className="flex flex-col">
@@ -57,7 +90,7 @@ export function MembershipStatsChart({ data }) {
       </CardHeader>
       <CardContent className="flex-1 pb-0">
         <ChartContainer
-          config={chartConfig}
+          config={{ members: { label: 'Members' } }}
           className="mx-auto aspect-square max-h-[250px]"
         >
           <PieChart>
@@ -79,31 +112,30 @@ export function MembershipStatsChart({ data }) {
             >
               <Label
                 content={({ viewBox }) => {
-                  if (viewBox && "cx" in viewBox && "cy" in viewBox) {
-                    return (
-                      <text
+                  if (!viewBox || typeof viewBox.cx !== 'number') return null
+                  return (
+                    <text
+                      x={viewBox.cx}
+                      y={viewBox.cy}
+                      textAnchor="middle"
+                      dominantBaseline="middle"
+                    >
+                      <tspan
                         x={viewBox.cx}
                         y={viewBox.cy}
-                        textAnchor="middle"
-                        dominantBaseline="middle"
+                        className="fill-foreground text-3xl font-bold"
                       >
-                        <tspan
-                          x={viewBox.cx}
-                          y={viewBox.cy}
-                          className="fill-foreground text-3xl font-bold"
-                        >
-                          {totalMembers.toLocaleString()}
-                        </tspan>
-                        <tspan
-                          x={viewBox.cx}
-                          y={(viewBox.cy || 0) + 24}
-                          className="fill-muted-foreground"
-                        >
-                          Members
-                        </tspan>
-                      </text>
-                    )
-                  }
+                        {totalMembers.toLocaleString()}
+                      </tspan>
+                      <tspan
+                        x={viewBox.cx}
+                        y={viewBox.cy + 24}
+                        className="fill-muted-foreground"
+                      >
+                        Members
+                      </tspan>
+                    </text>
+                  )
                 }}
               />
             </Pie>
@@ -121,3 +153,5 @@ export function MembershipStatsChart({ data }) {
     </Card>
   )
 }
+
+export default MembershipStatsChart;

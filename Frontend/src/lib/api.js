@@ -187,4 +187,37 @@ export const productService = {
   }
 };
 
+export const analyticsService = {
+  // 1. Monthly revenue + expenses for last 6 months
+  getRevenueData: async () => {
+    await getCsrfCookie();
+    return api.get('/admin/analytics/revenue');
+  },
+
+  // 2. Active membership distribution (counts per plan)
+  getMembershipDistribution: async () => {
+    await getCsrfCookie();
+    return api.get('/admin/analytics/membership');
+  },
+
+  // 3. Client age-group distribution
+  getAgeDistribution: async () => {
+    await getCsrfCookie();
+    return api.get('/admin/analytics/age-distribution');
+  },
+
+  // 4. Top 5 product sales
+  getProductSales: async () => {
+    await getCsrfCookie();
+    return api.get('/admin/analytics/product-sales');
+  },
+
+  // 5. Monthly profit margins for last 6 months
+  getProfitMargins: async () => {
+    await getCsrfCookie();
+    return api.get('/admin/analytics/profit-margins');
+  }
+};
+
+
 export default api;

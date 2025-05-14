@@ -1,6 +1,6 @@
-import { TrendingUp } from "lucide-react"
-import { Bar, BarChart, XAxis, YAxis } from "recharts"
-
+import React, { useState, useEffect } from 'react'
+import { TrendingUp } from 'lucide-react'
+import { Bar, BarChart, XAxis, YAxis } from 'recharts'
 import {
   Card,
   CardContent,
@@ -8,49 +8,92 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card"
+} from '@/components/ui/card'
 import {
   ChartContainer,
   ChartTooltip,
   ChartTooltipContent,
-} from "@/components/ui/chart"
+} from '@/components/ui/chart'
+import { analyticsService } from '@/lib/api'
 
 // Default data if API data is not available yet
 const defaultChartData = [
-  { product: "Protein Powder", sales: 124 },
-  { product: "Fitness Bands", sales: 98 },
-  { product: "Gym Gloves", sales: 85 },
-  { product: "Water Bottles", sales: 76 },
-  { product: "Yoga Mats", sales: 62 },
+  { product: 'Protein Powder', sales: 124 },
+  { product: 'Fitness Bands',  sales: 98  },
+  { product: 'Gym Gloves',     sales: 85  },
+  { product: 'Water Bottles',   sales: 76  },
+  { product: 'Yoga Mats',       sales: 62  },
 ]
 
 const chartConfig = {
   sales: {
-    label: "Units Sold",
-    color: "#10b981", // Emerald color
+    label: 'Units Sold',
+    color: '#10b981', // Emerald color
   },
 }
 
-export function ProductsSalesChart({ data }) {
-  // Use provided data or fall back to default
-  const chartData = data || defaultChartData;
-  
-  // Find top selling product
-  const getTopProduct = () => {
-    if (!chartData || chartData.length === 0) return "None";
-    
-    return chartData.reduce((max, current) => 
-      current.sales > max.sales ? current : max, chartData[0]).product;
-  };
-  
-  // Calculate total sales
-  const getTotalSales = () => {
-    if (!chartData) return 0;
-    return chartData.reduce((sum, product) => sum + product.sales, 0);
-  };
-  
-  const topProduct = getTopProduct();
-  const totalSales = getTotalSales();
+export function ProductsSalesChart() {
+  const [chartData, setChartData] = useState(null)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
+
+  useEffect(() => {
+    let isMounted = true
+    async function fetchData() {
+      try {
+        const response = await analyticsService.getProductSales()
+        // API returns { success: true, data: [...] }
+        const data = response.data.data.map(item => ({
+          product: item.product,
+          sales: item.sales,
+        }))
+        if (isMounted) setChartData(data)
+      } catch (err) {
+        console.error('Error fetching product sales:', err)
+        const msg = err.response?.data?.message || 'Unable to load product sales.'
+        if (isMounted) setError(msg)
+      } finally {
+        if (isMounted) setLoading(false)
+      }
+    }
+    fetchData()
+    return () => { isMounted = false }
+  }, [])
+
+  // Loading state
+  if (loading) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>Product Sales</CardTitle>
+        </CardHeader>
+        <CardContent className="py-10 text-center">Loading...</CardContent>
+      </Card>
+    )
+  }
+
+  // Error state
+  if (error) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>Product Sales</CardTitle>
+        </CardHeader>
+        <CardContent className="py-10 text-center text-red-600">{error}</CardContent>
+      </Card>
+    )
+  }
+
+  // Use fetched data or fallback
+  const dataToRender = chartData && chartData.length > 0 ? chartData : defaultChartData
+
+  // Determine top-selling product
+  const topProduct = dataToRender.reduce((max, curr) =>
+    curr.sales > max.sales ? curr : max, dataToRender[0]
+  ).product
+
+  // Calculate total units sold
+  const totalSales = dataToRender.reduce((sum, item) => sum + item.sales, 0)
 
   return (
     <Card>
@@ -61,12 +104,10 @@ export function ProductsSalesChart({ data }) {
       <CardContent>
         <ChartContainer config={chartConfig}>
           <BarChart
-            accessibilityLayer
-            data={chartData}
+            data={dataToRender}
             layout="vertical"
-            margin={{
-              left: -20,
-            }}
+            margin={{ left: -20 }}
+            accessibilityLayer
           >
             <XAxis type="number" dataKey="sales" hide />
             <YAxis
@@ -95,9 +136,10 @@ export function ProductsSalesChart({ data }) {
           {topProduct} is the best seller <TrendingUp className="h-4 w-4 text-emerald-500" />
         </div>
         <div className="leading-none text-muted-foreground">
-          Total of {totalSales} units sold this month
+          Total of {totalSales.toLocaleString()} units sold this month
         </div>
       </CardFooter>
     </Card>
   )
 }
+export default ProductsSalesChart;
