@@ -82,26 +82,25 @@ const ProductsCards = () => {
 
     // CRUD logic
     const handleAdd = () => {
-        console.log('Add button clicked');
-        // Reset form error if any
-        setFormError(null);
+    console.log('Add button clicked');
+    // Reset form error if any
+    setFormError(null);
 
-        setFormData({
-            name: '',
-            description: '',
-            price: 0,
-            cost: 0,
-            stock_quantity: 0,
-            category: '',
-            image_url: '',
-            is_active: true,
-            gym_id: 1
-        });
-        setModalType('add');
-        setShowModal(true);
-
-        console.log('Modal should be visible now');
-    };
+    setFormData({
+        name: '',
+        description: '',
+        price: 0,
+        cost: 0,
+        stock_quantity: 0,
+        category: '',
+        image_url: '',
+        is_active: true,
+        gym_id: 1
+    });
+    setModalType('add');
+    setShowModal(true);
+    console.log('Modal state after click:', showModal); // Add this for debugging
+};
 
     const handleEdit = async (product) => {
         try {
