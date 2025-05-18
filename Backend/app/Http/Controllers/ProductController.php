@@ -3,10 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\GymProduct;
-use App\Models\Gym;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Log;
 
 class ProductController extends Controller
 {
@@ -44,19 +43,32 @@ class ProductController extends Controller
     public function getProduct($id)
     {
         try {
-            $product = GymProduct::with(['gym:id,name'])
-                ->findOrFail($id);
+            // First check if the product exists
+            $product = GymProduct::find($id);
+
+            if (!$product) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Product not found'
+                ], 404);
+            }
+
+            // Load the gym relationship
+            $product->load('gym:id,name');
 
             return response()->json([
                 'status' => 'success',
                 'data' => $product
             ]);
         } catch (\Exception $e) {
+            // Log the error for debugging
+            Log::error('Error retrieving product: ' . $e->getMessage());
+
             return response()->json([
                 'status' => 'error',
-                'message' => 'Product not found',
+                'message' => 'Failed to retrieve product',
                 'error' => $e->getMessage()
-            ], 404);
+            ], 500);
         }
     }
 

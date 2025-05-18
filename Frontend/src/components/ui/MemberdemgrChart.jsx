@@ -40,7 +40,7 @@ export function MemberdemgrChart() {
   useEffect(() => {
     let isMounted = true
     async function fetchData() {
-      try {
+      try { 
         const response = await analyticsService.getAgeDistribution()
         const data = response.data.data
         if (isMounted) setChartData(data)
