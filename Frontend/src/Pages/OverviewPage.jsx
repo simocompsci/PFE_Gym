@@ -4,9 +4,9 @@ import StatCards from '../components/common/StatCards'
 import { motion } from 'framer-motion'
 import MessageCards from '../components/common/MessageCrads'
 import { BarChart2, ShoppingBag, Users, Zap } from "lucide-react";
-import MyCalendar from '@/components/Overview/MyCalendar'
 import GymEvents from '@/components/Overview/GymEvents'
 import StaffAttendance from '@/components/Overview/StaffAttendance'
+import TodoList from '@/components/Overview/TodoList'
 
 
 const OverviewPage = () => {
@@ -44,14 +44,15 @@ const OverviewPage = () => {
         </div>
         <div className="grid grid-cols-1 gap-4 mt-6 md:grid-cols-2 xl:grid-cols-3 mb-8">
           <div className="h-full">
-            <MyCalendar />
+            <StaffAttendance />
           </div>
           <div className="h-full">
             <GymEvents />
           </div>
-          <div className="h-full md:col-span-2 xl:col-span-1">
-            <StaffAttendance />
+          <div className="h-full">
+            <TodoList />
           </div>
+          
         </div>
       </motion.div>
     </div>

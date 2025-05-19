@@ -1,9 +1,10 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import {
   Search, Plus, Trash2, Eye, X, AlertCircle, Check, Edit,
-  Package, DollarSign, BarChart3, Tag, Layers
+  Package, DollarSign, BarChart3, Tag, Layers, Loader2
 } from 'lucide-react';
 import { productService } from '../../lib/api';
+import './ProductsCards.css'; // Import custom scrollbar styles
 
 // Default form data for new products
 const DEFAULT_FORM_DATA = Object.freeze({
@@ -344,7 +345,7 @@ const ProductsCards = () => {
             <input
               type="text"
               placeholder="Search Products..."
-              className="bg-gray-100 text-black placeholder-gray-400 rounded-lg pl-10 pr-4 py-2 focus:outline-none focus:ring-2 focus:ring-black"
+              className="bg-gray-200 bg-opacity-15 text-black placeholder-gray-400 rounded-lg pl-10 pr-4 py-2 focus:outline-none focus:ring-2 focus:ring-gray-500"
               onChange={handleSearch}
             />
             <Search className="absolute left-3 top-2.5 text-gray-400" size={18} />
@@ -357,7 +358,7 @@ const ProductsCards = () => {
             console.log('Add Product button clicked');
 
             // Set form data to default values
-            const defaultData = {...DEFAULT_FORM_DATA};
+            const defaultData = { ...DEFAULT_FORM_DATA };
             console.log('Setting form data to default:', defaultData);
             setFormData(defaultData);
 
@@ -430,260 +431,370 @@ const ProductsCards = () => {
       )}
 
       {/* Product Modal */}
-      {/* Force modal to be visible if showModal is true */}
-
-      <div
-        key={`modal-${modalType}-${Date.now()}`} // Force re-render with unique key
-        className={`fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[9999] overflow-y-auto ${showModal ? 'block' : 'hidden'}`}
-        style={{ display: showModal ? 'flex' : 'none' }}
-        onClick={(e) => {
-          if (e.target === e.currentTarget) {
-            closeModal();
-          }
-        }}
-      >
-          <div className="bg-white rounded-xl shadow-xl p-6 w-full max-w-md mx-4 my-8 relative">
-            <div className="flex justify-between items-center mb-4">
-              <h3 className="text-lg font-bold">
+      {showModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-60 backdrop-blur-sm transition-opacity duration-300 p-2 sm:p-4 overflow-auto">
+          <div className="bg-white rounded-xl shadow-xl w-full max-w-md mx-auto relative my-4 sm:my-8 flex flex-col max-h-[90vh]">
+            <div className="bg-gradient-to-r from-blue-600 to-indigo-700 p-6 text-white flex-shrink-0 rounded-t-xl">
+              <h2 className="text-xl font-bold">
                 {modalType === 'add' && 'Add Product'}
                 {modalType === 'edit' && 'Edit Product'}
                 {modalType === 'view' && 'Product Details'}
-              </h3>
+              </h2>
               <button
+                className="absolute top-4 right-4 text-white hover:text-blue-200 focus:outline-none transition-colors"
                 onClick={closeModal}
-                className="text-gray-500 hover:text-gray-700"
               >
-                <X size={20} />
+                <X size={24} />
               </button>
             </div>
-            <form onSubmit={handleFormSubmit}>
-              <div className="mb-4">
-                <label className="block text-gray-700 font-semibold mb-2">
-                  Name <span className="text-red-500">*</span>
-                </label>
-                <input
-                  type="text"
-                  name="name"
-                  value={formData.name}
-                  onChange={handleInputChange}
-                  className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
-                  required
-                  maxLength={100}
-                  disabled={modalType === 'view'}
-                  placeholder="Enter product name"
-                />
-                <p className="text-xs text-gray-500 mt-1">Maximum 100 characters</p>
-              </div>
-              <div className="mb-4">
-                <label className="block text-gray-700 font-semibold mb-2">Description</label>
-                <textarea
-                  name="description"
-                  value={formData.description}
-                  onChange={handleInputChange}
-                  className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
-                  rows="3"
-                  disabled={modalType === 'view'}
-                  placeholder="Enter product description"
-                ></textarea>
-              </div>
-              <div className="grid grid-cols-2 gap-4 mb-4">
-                <div>
-                  <label className="block text-gray-700 font-semibold mb-2">
-                    Price ($) <span className="text-red-500">*</span>
-                  </label>
-                  <input
-                    type="number"
-                    name="price"
-                    value={formData.price}
-                    onChange={handleInputChange}
-                    className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
-                    min="0"
-                    step="0.01"
-                    required
-                    disabled={modalType === 'view'}
-                    placeholder="0.00"
-                  />
-                </div>
-                <div>
-                  <label className="block text-gray-700 font-semibold mb-2">Cost ($)</label>
-                  <input
-                    type="number"
-                    name="cost"
-                    value={formData.cost}
-                    onChange={handleInputChange}
-                    className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
-                    min="0"
-                    step="0.01"
-                    disabled={modalType === 'view'}
-                    placeholder="0.00"
-                  />
-                </div>
-              </div>
-              <div className="grid grid-cols-2 gap-4 mb-4">
-                <div>
-                  <label className="block text-gray-700 font-semibold mb-2">Stock Quantity</label>
-                  <input
-                    type="number"
-                    name="stock_quantity"
-                    value={formData.stock_quantity}
-                    onChange={handleInputChange}
-                    className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
-                    min="0"
-                    disabled={modalType === 'view'}
-                    placeholder="0"
-                  />
-                </div>
-                <div>
-                  <label className="block text-gray-700 font-semibold mb-2">Category</label>
-                  <select
-                    name="category"
-                    value={formData.category}
-                    onChange={handleInputChange}
-                    className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
-                    disabled={modalType === 'view'}
-                  >
-                    <option value="">Select a category</option>
-                    <option value="Supplements">Supplements</option>
-                    <option value="Apparel">Apparel</option>
-                    <option value="Equipment">Equipment</option>
-                    <option value="Accessories">Accessories</option>
-                    <option value="Nutrition">Nutrition</option>
-                  </select>
-                </div>
-              </div>
-              <div className="mb-4">
-                <label className="block text-gray-700 font-semibold mb-2">Image URL</label>
-                <input
-                  type="text"
-                  name="image_url"
-                  value={formData.image_url}
-                  onChange={handleInputChange}
-                  className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
-                  disabled={modalType === 'view'}
-                  placeholder="https://example.com/image.jpg"
-                  maxLength={255}
-                />
-                {formData.image_url && formData.image_url.includes('imgs.search.brave.com') && (
-                  <p className="text-red-500 text-xs mt-1">
-                    Warning: Brave search image URLs are not supported. Please use a direct image URL.
-                  </p>
-                )}
-                <p className="text-xs text-gray-500 mt-1">Maximum 255 characters</p>
 
-                {/* Image Preview */}
+            {modalType === 'view' ? (
+              // View mode - Display product details in a clean format
+              <div className="p-6 overflow-y-auto flex-1 custom-scrollbar">
+                <div className="mb-3"><span className="font-semibold text-gray-700">Name:</span> <span className="text-gray-900">{formData.name}</span></div>
+                <div className="mb-3"><span className="font-semibold text-gray-700">Description:</span> <span className="text-gray-900">{formData.description || 'Not provided'}</span></div>
+                <div className="mb-3"><span className="font-semibold text-gray-700">Price:</span> <span className="text-gray-900">${Number(formData.price).toFixed(2)}</span></div>
+                <div className="mb-3"><span className="font-semibold text-gray-700">Cost:</span> <span className="text-gray-900">${Number(formData.cost).toFixed(2)}</span></div>
+                <div className="mb-3"><span className="font-semibold text-gray-700">Stock Quantity:</span> <span className="text-gray-900">{formData.stock_quantity} units</span></div>
+                <div className="mb-3">
+                  <span className="font-semibold text-gray-700">Category:</span>
+                  {formData.category ? (
+                    <span className="ml-2 px-2 py-1 rounded-full text-xs font-semibold bg-gray-100 text-gray-700 border border-gray-200">
+                      {formData.category}
+                    </span>
+                  ) : (
+                    <span className="text-gray-500"> Not specified</span>
+                  )}
+                </div>
+                <div className="mb-3">
+                  <span className="font-semibold text-gray-700">Status:</span>
+                  <span className={`ml-2 px-2 py-1 rounded-full text-xs font-semibold ${formData.is_active ? 'bg-green-100 text-green-800 border border-green-200' : 'bg-red-100 text-red-800 border border-red-200'}`}>
+                    {formData.is_active ? 'Active' : 'Inactive'}
+                  </span>
+                </div>
+
                 {formData.image_url && !formData.image_url.includes('imgs.search.brave.com') && (
-                  <div className="mt-2 border rounded-lg p-2 flex justify-center">
-                    <img
-                      src={formData.image_url}
-                      alt="Product preview"
-                      className="h-24 object-contain"
-                      onError={(e) => {
-                        e.target.src = '/placeholder-image.svg';
-                      }}
-                    />
+                  <div className="mt-4 mb-3">
+                    <span className="font-semibold text-gray-700 block mb-2">Product Image:</span>
+                    <div className="border rounded-lg p-2 flex justify-center">
+                      <img
+                        src={formData.image_url}
+                        alt={formData.name}
+                        className="h-32 object-contain"
+                        onError={(e) => {
+                          e.target.src = '/placeholder-image.svg';
+                        }}
+                      />
+                    </div>
                   </div>
                 )}
-              </div>
-              <div className="mb-4">
-                <input type="hidden" name="gym_id" value={formData.gym_id} />
-              </div>
-              <div className="mb-6 flex items-center">
-                <input
-                  type="checkbox"
-                  name="is_active"
-                  checked={formData.is_active}
-                  onChange={handleInputChange}
-                  className="mr-2"
-                  disabled={modalType === 'view'}
-                />
-                <label className="text-gray-700 font-semibold">Active</label>
-              </div>
 
-              {/* Form error message */}
-              {formError && (
-                <div className="mb-4 p-3 bg-red-50 border border-red-200 text-red-700 rounded-lg">
-                  <div className="flex items-center">
-                    <AlertCircle size={18} className="mr-2" />
-                    <span className="text-sm">{formError}</span>
-                  </div>
-                </div>
-              )}
-
-              {/* View mode has only a close button */}
-              {modalType === 'view' ? (
-                <button
-                  type="button"
-                  className="w-full bg-gray-300 text-gray-900 py-2 rounded-lg font-semibold"
-                  onClick={closeModal}
-                >
-                  Close
-                </button>
-              ) : (
-                /* Add/Edit mode has Save and Cancel buttons */
-                <div className="flex flex-col space-y-2">
+                <div className="flex gap-3 mt-6">
                   <button
-                    type="submit"
-                    className="w-full bg-black text-white py-2 rounded-lg font-semibold hover:bg-gray-800 transition-colors flex justify-center items-center"
-                    disabled={isSubmitting}
+                    className="flex-1 px-4 py-2.5 rounded-lg bg-blue-600 text-white font-semibold hover:bg-blue-700 transition"
+                    onClick={() => {
+                      closeModal();
+                      setTimeout(() => handleEdit(formData), 100);
+                    }}
                   >
-                    {isSubmitting ? (
-                      <>
-                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                        {modalType === 'add' ? 'Adding...' : 'Saving...'}
-                      </>
-                    ) : (
-                      modalType === 'add' ? 'Add Product' : 'Save Changes'
-                    )}
+                    Edit
                   </button>
+                  <button
+                    className="flex-1 px-4 py-2.5 rounded-lg bg-gray-200 text-gray-700 font-semibold hover:bg-gray-300 transition"
+                    onClick={closeModal}
+                  >
+                    Close
+                  </button>
+                </div>
+              </div>
+            ) : (
+              // Add/Edit mode - Show form with StaffFormModal styling
+              <>
+                <form id="product-form" onSubmit={handleFormSubmit} className="p-6 overflow-y-auto flex-1 custom-scrollbar">
+                  {/* Form error message */}
+                  {formError && (
+                    <div className="mb-6 p-4 bg-red-50 text-red-700 rounded-lg border border-red-100 flex items-start">
+                      <div className="text-red-500 mr-3 flex-shrink-0 pt-0.5">
+                        <AlertCircle size={18} />
+                      </div>
+                      <div className="text-sm font-medium">{formError}</div>
+                    </div>
+                  )}
 
+                  {/* Product Name */}
+                  <div className="mb-5">
+                    <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                      Product Name <span className="text-red-500">*</span>
+                    </label>
+                    <div className="relative">
+                      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
+                        <Package size={16} />
+                      </div>
+                      <input
+                        type="text"
+                        name="name"
+                        value={formData.name}
+                        onChange={handleInputChange}
+                        className="w-full pl-10 pr-3 py-2.5 border border-gray-300 rounded-lg text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors"
+                        required
+                        maxLength={100}
+                        placeholder="Enter product name"
+                      />
+                    </div>
+                    <p className="mt-1.5 text-xs text-gray-500">Maximum 100 characters</p>
+                  </div>
+
+                  {/* Description */}
+                  <div className="mb-5">
+                    <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                      Description
+                    </label>
+                    <textarea
+                      name="description"
+                      value={formData.description}
+                      onChange={handleInputChange}
+                      className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors"
+                      rows="3"
+                      placeholder="Enter product description"
+                    ></textarea>
+                  </div>
+
+                  {/* Price and Cost */}
+                  <div className="grid grid-cols-2 gap-4 mb-5">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                        Price ($) <span className="text-red-500">*</span>
+                      </label>
+                      <div className="relative">
+                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
+                          <DollarSign size={16} />
+                        </div>
+                        <input
+                          type="number"
+                          name="price"
+                          value={formData.price}
+                          onChange={handleInputChange}
+                          className="w-full pl-10 pr-3 py-2.5 border border-gray-300 rounded-lg text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors"
+                          min="0"
+                          step="0.01"
+                          required
+                          placeholder="0.00"
+                        />
+                      </div>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                        Cost ($)
+                      </label>
+                      <div className="relative">
+                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
+                          <DollarSign size={16} />
+                        </div>
+                        <input
+                          type="number"
+                          name="cost"
+                          value={formData.cost}
+                          onChange={handleInputChange}
+                          className="w-full pl-10 pr-3 py-2.5 border border-gray-300 rounded-lg text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors"
+                          min="0"
+                          step="0.01"
+                          placeholder="0.00"
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Stock and Category */}
+                  <div className="grid grid-cols-2 gap-4 mb-5">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                        Stock Quantity
+                      </label>
+                      <div className="relative">
+                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
+                          <Layers size={16} />
+                        </div>
+                        <input
+                          type="number"
+                          name="stock_quantity"
+                          value={formData.stock_quantity}
+                          onChange={handleInputChange}
+                          className="w-full pl-10 pr-3 py-2.5 border border-gray-300 rounded-lg text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors"
+                          min="0"
+                          placeholder="0"
+                        />
+                      </div>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                        Category
+                      </label>
+                      <div className="relative">
+                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
+                          <Tag size={16} />
+                        </div>
+                        <select
+                          name="category"
+                          value={formData.category}
+                          onChange={handleInputChange}
+                          className="w-full pl-10 pr-3 py-2.5 border border-gray-300 rounded-lg text-gray-700 appearance-none bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors"
+                        >
+                          <option value="">Select a category</option>
+                          <option value="Supplements">Supplements</option>
+                          <option value="Apparel">Apparel</option>
+                          <option value="Equipment">Equipment</option>
+                          <option value="Accessories">Accessories</option>
+                          <option value="Nutrition">Nutrition</option>
+                        </select>
+                        <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                          <svg className="h-4 w-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
+                          </svg>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Image URL */}
+                  <div className="mb-5">
+                    <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                      Image URL
+                    </label>
+                    <div className="relative">
+                      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                        </svg>
+                      </div>
+                      <input
+                        type="text"
+                        name="image_url"
+                        value={formData.image_url}
+                        onChange={handleInputChange}
+                        className="w-full pl-10 pr-3 py-2.5 border border-gray-300 rounded-lg text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors"
+                        placeholder="https://example.com/image.jpg"
+                        maxLength={255}
+                      />
+                    </div>
+                    {formData.image_url && formData.image_url.includes('imgs.search.brave.com') && (
+                      <p className="mt-1.5 text-xs text-red-600">
+                        Warning: Brave search image URLs are not supported. Please use a direct image URL.
+                      </p>
+                    )}
+                    <p className="mt-1.5 text-xs text-gray-500">Maximum 255 characters</p>
+
+                    {/* Image Preview */}
+                    {formData.image_url && !formData.image_url.includes('imgs.search.brave.com') && (
+                      <div className="mt-2 border rounded-lg p-2 flex justify-center">
+                        <img
+                          src={formData.image_url}
+                          alt="Product preview"
+                          className="h-24 object-contain"
+                          onError={(e) => {
+                            e.target.src = '/placeholder-image.svg';
+                          }}
+                        />
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="mb-4">
+                    <input type="hidden" name="gym_id" value={formData.gym_id} />
+                  </div>
+
+                  {/* Active Status */}
+                  <div className="mb-6 flex items-center p-3 bg-gray-50 rounded-lg">
+                    <input
+                      type="checkbox"
+                      id="is_active"
+                      name="is_active"
+                      checked={formData.is_active}
+                      onChange={handleInputChange}
+                      className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                    />
+                    <label htmlFor="is_active" className="ml-2 text-sm font-medium text-gray-700">
+                      Active Product
+                    </label>
+                  </div>
+                </form>
+
+                {/* Form actions - fixed at the bottom */}
+                <div className="p-4 border-t border-gray-100 bg-gray-50 rounded-b-xl flex justify-end gap-3">
                   <button
                     type="button"
-                    className="w-full bg-gray-300 text-gray-900 py-2 rounded-lg font-semibold"
                     onClick={closeModal}
+                    className="px-5 py-2.5 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-300 transition-colors"
+                    disabled={isSubmitting}
                   >
                     Cancel
                   </button>
+                  <button
+                    form="product-form" // Connect to the form
+                    type="submit"
+                    disabled={isSubmitting}
+                    className="px-5 py-2.5 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors disabled:opacity-50 flex items-center justify-center min-w-[100px]"
+                  >
+                    {isSubmitting ? (
+                      <>
+                        <Loader2 size={16} className="animate-spin mr-2" />
+                        <span>{modalType === 'add' ? 'Adding...' : 'Saving...'}</span>
+                      </>
+                    ) : (
+                      <span>{modalType === 'add' ? 'Add Product' : 'Save Changes'}</span>
+                    )}
+                  </button>
                 </div>
-              )}
-            </form>
+              </>
+            )}
           </div>
         </div>
+      )}
 
 
       {/* Delete confirmation dialog */}
       {showDeleteConfirm && productToDelete && (
-        <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
-          <div className="bg-white rounded-xl shadow-lg p-6 w-full max-w-md mx-auto">
-            <h3 className="text-lg font-bold mb-4 flex items-center text-red-600">
-              <AlertCircle className="mr-2" size={24} />
-              Confirm Deletion
-            </h3>
-            <p className="mb-6">
-              Are you sure you want to delete <span className="font-semibold">{productToDelete.name}</span>?
-              This action cannot be undone.
-            </p>
-            <div className="flex space-x-3">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-60 backdrop-blur-sm transition-opacity duration-300 p-2 sm:p-4 overflow-auto">
+          <div className="bg-white rounded-xl shadow-xl w-full max-w-md mx-auto relative my-4 sm:my-8 flex flex-col max-h-[90vh]">
+            <div className="bg-gradient-to-r from-red-600 to-red-700 p-6 text-white flex-shrink-0 rounded-t-xl">
+              <h2 className="text-xl font-bold flex items-center">
+                <AlertCircle className="mr-2" size={24} />
+                Confirm Deletion
+              </h2>
               <button
+                className="absolute top-4 right-4 text-white hover:text-red-200 focus:outline-none transition-colors"
                 onClick={handleCancelDelete}
-                className="flex-1 px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors"
-                disabled={isDeleting}
               >
-                Cancel
+                <X size={24} />
               </button>
-              <button
-                onClick={handleDelete}
-                className="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors flex justify-center items-center"
-                disabled={isDeleting}
-              >
-                {isDeleting ? (
-                  <>
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                    Deleting...
-                  </>
-                ) : (
-                  'Delete'
-                )}
-              </button>
+            </div>
+            <div className="p-6 overflow-y-auto flex-1 custom-scrollbar">
+              <p className="mb-6 text-gray-700">
+                Are you sure you want to delete <span className="font-semibold text-gray-900">{productToDelete.name}</span>?
+                This action cannot be undone.
+              </p>
+              <div className="flex gap-3">
+                <button
+                  onClick={handleCancelDelete}
+                  className="flex-1 px-4 py-2.5 rounded-lg bg-gray-200 text-gray-700 font-semibold hover:bg-gray-300 transition"
+                  disabled={isDeleting}
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleDelete}
+                  className="flex-1 px-4 py-2.5 rounded-lg bg-red-600 text-white font-semibold hover:bg-red-700 transition flex justify-center items-center"
+                  disabled={isDeleting}
+                >
+                  {isDeleting ? (
+                    <>
+                      <Loader2 size={16} className="animate-spin mr-2" />
+                      Deleting...
+                    </>
+                  ) : (
+                    'Delete'
+                  )}
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -691,11 +802,10 @@ const ProductsCards = () => {
 
       {/* Notification toast */}
       {notification.show && (
-        <div className={`fixed bottom-4 right-4 px-6 py-3 rounded-lg shadow-lg flex items-center z-50 ${
-          notification.type === 'success'
+        <div className={`fixed bottom-4 right-4 px-6 py-3 rounded-lg shadow-lg flex items-center z-50 ${notification.type === 'success'
             ? 'bg-green-100 text-green-800 border border-green-200'
             : 'bg-red-100 text-red-800 border border-red-200'
-        }`}>
+          }`}>
           {notification.type === 'success' ? (
             <Check className="mr-2" size={20} />
           ) : (
@@ -719,7 +829,7 @@ const ProductCard = ({ product, onView, onEdit, onDelete }) => {
   return (
     <div
       key={product.id}
-      className="w-full max-w-[280px] bg-white rounded-xl shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden flex flex-col h-full border border-gray-100 relative hover:border-gray-300"
+      className="w-full max-w-[280px] bg-white rounded-xl overflow-hidden flex flex-col h-full border border-gray-200 relative "
     >
       {/* Product Image */}
       <div className="relative w-full pt-4 px-4">
@@ -739,11 +849,10 @@ const ProductCard = ({ product, onView, onEdit, onDelete }) => {
 
         {/* Status badge */}
         <div className="absolute top-2 right-2">
-          <span className={`px-2 py-1 rounded-full text-xs font-semibold ${
-            product.is_active
+          <span className={`px-2 py-1 rounded-full text-xs font-semibold ${product.is_active
               ? 'bg-green-100 text-green-800'
               : 'bg-red-100 text-red-800'
-          }`}>
+            }`}>
             {product.is_active ? 'Active' : 'Inactive'}
           </span>
         </div>

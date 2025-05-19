@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Search, Plus, Trash2, ChevronLeft, ChevronRight, Edit } from 'lucide-react';
+import { Search, Plus, Trash2, ChevronLeft, ChevronRight, Edit, Eye, X, AlertCircle } from 'lucide-react';
 import { staffService } from '../../lib/api';
 import StaffFormModal from './StaffFormModal';
 import DeleteConfirmationModal from './DeleteConfirmationModal';
@@ -19,6 +19,7 @@ const StaffTable = () => {
     const [isAddModalOpen, setIsAddModalOpen] = useState(false);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+    const [isViewModalOpen, setIsViewModalOpen] = useState(false);
     const [currentStaff, setCurrentStaff] = useState(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -64,6 +65,12 @@ const StaffTable = () => {
     // Handle opening the add staff modal
     const handleAddStaff = () => {
         setIsAddModalOpen(true);
+    };
+
+    // Handle opening the view staff modal
+    const handleViewStaff = (staff) => {
+        setCurrentStaff(staff);
+        setIsViewModalOpen(true);
     };
 
     // Handle opening the edit staff modal
@@ -272,6 +279,14 @@ const StaffTable = () => {
                                                 </td>
                                                 <td className="px-2 py-2 whitespace-nowrap text-sm font-medium text-gray-900 rounded-r-xl">
                                                     <button
+                                                        className="p-2 rounded-full transition-colors bg-gray-50 hover:bg-blue-100 text-blue-600 hover:text-blue-800"
+                                                        onClick={() => handleViewStaff(user)}
+                                                        title="Show Info"
+                                                    >
+                                                        <span className="sr-only">View</span>
+                                                        <Eye size={18} />
+                                                    </button>
+                                                    <button
                                                         className='text-blue-500 hover:text-blue-700 p-2 rounded-full transition-colors duration-150'
                                                         onClick={() => handleEditStaff(user)}
                                                         title="Edit"
@@ -364,6 +379,61 @@ const StaffTable = () => {
                 staffName={currentStaff ? `${currentStaff.first_name} ${currentStaff.last_name}` : ''}
                 isDeleting={isSubmitting}
             />
+
+            {/* View Staff Details Modal */}
+            {isViewModalOpen && currentStaff && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-60 backdrop-blur-sm transition-opacity duration-300 p-2 sm:p-4 overflow-hidden">
+                    <div className="bg-white rounded-xl shadow-xl w-full max-w-md relative overflow-hidden">
+                        <div className="bg-gradient-to-r from-blue-600 to-indigo-700 p-6 text-white">
+                            <h2 className="text-xl font-bold">Staff Details</h2>
+                            <button
+                                className="absolute top-4 right-4 text-white hover:text-blue-200 focus:outline-none transition-colors"
+                                onClick={() => setIsViewModalOpen(false)}
+                            >
+                                <X size={24} />
+                            </button>
+                        </div>
+                        <div className="p-6">
+                            <div className="mb-3"><span className="font-semibold text-gray-700">Name:</span> <span className="text-gray-900">{currentStaff.first_name} {currentStaff.last_name}</span></div>
+                            <div className="mb-3"><span className="font-semibold text-gray-700">Email:</span> <span className="text-gray-900">{currentStaff.email || 'Not provided'}</span></div>
+                            <div className="mb-3"><span className="font-semibold text-gray-700">Phone:</span> <span className="text-gray-900">{currentStaff.phone}</span></div>
+                            <div className="mb-3">
+                                <span className="font-semibold text-gray-700">Role:</span>
+                                <span className={`ml-2 px-2 py-1 rounded-full text-xs font-semibold ${
+                                    currentStaff.role === 'Coach'
+                                        ? 'bg-blue-100 text-blue-700 border border-blue-200'
+                                        : 'bg-emerald-100 text-emerald-700 border border-emerald-200'
+                                }`}>
+                                    {currentStaff.role}
+                                </span>
+                            </div>
+                            {currentStaff.role === 'Coach' && (
+                                <div className="mb-3"><span className="font-semibold text-gray-700">Specialization:</span> <span className="text-gray-900">{currentStaff.specialization || 'Not specified'}</span></div>
+                            )}
+                            {currentStaff.role === 'Secretary' && (
+                                <div className="mb-3"><span className="font-semibold text-gray-700">Shift Schedule:</span> <span className="text-gray-900">{currentStaff.shift_schedule || 'Not specified'}</span></div>
+                            )}
+                            <div className="flex gap-3 mt-6">
+                                <button
+                                    className="flex-1 px-4 py-2.5 rounded-lg bg-blue-600 text-white font-semibold hover:bg-blue-700 transition"
+                                    onClick={() => {
+                                        setIsViewModalOpen(false);
+                                        handleEditStaff(currentStaff);
+                                    }}
+                                >
+                                    Edit
+                                </button>
+                                <button
+                                    className="flex-1 px-4 py-2.5 rounded-lg bg-gray-200 text-gray-700 font-semibold hover:bg-gray-300 transition"
+                                    onClick={() => setIsViewModalOpen(false)}
+                                >
+                                    Close
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
         </>
     );
 };
