@@ -1,3 +1,4 @@
+
 import React from 'react';
 
 const mockEvents = [
@@ -24,6 +25,14 @@ const mockEvents = [
     time: "19:00",
     description: "Learn about healthy eating habits with our expert.",
     color: "#fbbf24"
+  },
+   {
+    id: 4,
+    name: "Pushups Challenge",
+    date: "2025-05-03",
+    time: "15:00",
+    description: "High-Intensity challenge for our members.",
+    color: "#60a5fa"
   }
 ];
 

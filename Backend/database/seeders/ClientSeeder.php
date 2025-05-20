@@ -64,7 +64,7 @@ class ClientSeeder extends Seeder
 
         // Create 30 clients with memberships
         Client::factory()
-            ->count(10)
+            ->count(20)
             ->create()
             ->each(function ($client) {
                 // Create a membership for each client

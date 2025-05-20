@@ -18,9 +18,9 @@ import { analyticsService } from '@/lib/api'
 
 // Chart fill colors config
 const chartConfig = {
-  Gold: { color: '#fbbf24' },
-  Silver: { color: '#94a3b8' },
-  Bronze: { color: '#b45309' },
+  Gold: { color: '#38bdf8' },
+  Silver: { color: '#93c5fd' },
+  Bronze: { color: '#22d3ee' },
 }
 
 export function MembershipStatsChart() {

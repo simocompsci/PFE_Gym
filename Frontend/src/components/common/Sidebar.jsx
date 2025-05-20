@@ -1,4 +1,4 @@
-import { BarChart2, DollarSign, Menu, ShoppingBag, ShoppingCart, TrendingUp, Users, LogOut } from "lucide-react";
+import { BarChart2, Dumbbell, Menu,ShieldUser ,  ShoppingBag, ShoppingCart, TrendingUp, Users, LogOut } from "lucide-react";
 import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Link, useNavigate } from "react-router-dom";
@@ -7,9 +7,9 @@ import { useAuth } from '../../lib/AuthContext';
 
 const SIDEBAR_ITEMS = [
 	{name: "Overview",icon: BarChart2,color: "black",href: "/admin/dashboard",},
-    { name: "Staff", icon: ShoppingBag, color: "black", href: "/staff" },
+    { name: "Staff", icon: ShieldUser, color: "black", href: "/staff" },
 	{ name: "Clients", icon: Users, color: "black", href: "/clients" },
-	{ name: "Classes", icon: DollarSign, color: "black", href: "/classes" },
+	{ name: "Classes", icon: Dumbbell, color: "black", href: "/classes" },
 	{ name: "Products", icon: ShoppingCart, color: "black", href: "/products" },
 	{ name: "Analytics", icon: TrendingUp, color: "black", href: "/analytics" },
 ];
