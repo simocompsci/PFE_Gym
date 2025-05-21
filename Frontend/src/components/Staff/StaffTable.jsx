@@ -382,7 +382,7 @@ const StaffTable = () => {
 
             {/* View Staff Details Modal */}
             {isViewModalOpen && currentStaff && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-60 backdrop-blur-sm transition-opacity duration-300 p-2 sm:p-4 overflow-hidden">
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-transparent bg-opacity-75 backdrop-blur-sm backdrop-brightness-50 transition-opacity duration-300 p-2 sm:p-4 overflow-hidden">
                     <div className="bg-white rounded-xl shadow-xl w-full max-w-md relative overflow-hidden">
                         <div className="bg-gradient-to-r from-blue-600 to-indigo-700 p-6 text-white">
                             <h2 className="text-xl font-bold">Staff Details</h2>

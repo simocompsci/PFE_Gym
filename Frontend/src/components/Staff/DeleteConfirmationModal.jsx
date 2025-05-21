@@ -5,7 +5,7 @@ const DeleteConfirmationModal = ({ isOpen, onClose, onConfirm, staffName, isDele
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-transparent bg-opacity-75 backdrop-blur-sm backdrop-brightness-50 transition-opacity duration-300">
       <div className="bg-white rounded-xl shadow-lg p-6 w-full max-w-md mx-auto">
         <h3 className="text-lg font-bold mb-4 flex items-center text-red-600">
           <AlertCircle className="mr-2" size={24} />

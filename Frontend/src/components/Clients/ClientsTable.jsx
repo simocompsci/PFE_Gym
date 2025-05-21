@@ -688,7 +688,7 @@ const ClientsTable = () => {
 
             {/* Modal for Add/Edit */}
             {showModal && (modalType === 'add' || modalType === 'edit') && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-60 backdrop-blur-sm transition-opacity duration-300 p-2 sm:p-4 overflow-hidden">
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-transparent bg-opacity-75 backdrop-blur-sm backdrop-brightness-50 transition-opacity duration-300 p-2 sm:p-4 overflow-hidden">
                     <div className="bg-white rounded-xl shadow-2xl w-full max-w-md mx-auto my-auto transform transition-all duration-300 scale-100 opacity-100 max-h-[95vh] sm:max-h-[90vh] flex flex-col">
                         {/* Header with gradient background */}
                         <div className="bg-gradient-to-r from-blue-600 to-indigo-700 rounded-t-xl p-6 text-white relative">
@@ -878,7 +878,7 @@ const ClientsTable = () => {
 
             {/* View Client Details Modal */}
             {showModal && modalType === 'view' && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-60 backdrop-blur-sm transition-opacity duration-300 p-2 sm:p-4 overflow-hidden">
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-transparent bg-opacity-75 backdrop-blur-sm backdrop-brightness-50 transition-opacity duration-300 p-2 sm:p-4 overflow-hidden">
                     <div className="bg-white rounded-xl shadow-xl w-full max-w-md relative overflow-hidden">
                         <div className="bg-gradient-to-r from-blue-600 to-indigo-700 p-6 text-white">
                             <h2 className="text-xl font-bold">Client Details</h2>

@@ -432,7 +432,7 @@ const ProductsCards = () => {
 
       {/* Product Modal */}
       {showModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-60 backdrop-blur-sm transition-opacity duration-300 p-2 sm:p-4 overflow-auto">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-transparent bg-opacity-75 backdrop-blur-sm backdrop-brightness-50 transition-opacity duration-300 p-2 sm:p-4 overflow-auto">
           <div className="bg-white rounded-xl shadow-xl w-full max-w-md mx-auto relative my-4 sm:my-8 flex flex-col max-h-[90vh]">
             <div className="bg-gradient-to-r from-blue-600 to-indigo-700 p-6 text-white flex-shrink-0 rounded-t-xl">
               <h2 className="text-xl font-bold">
