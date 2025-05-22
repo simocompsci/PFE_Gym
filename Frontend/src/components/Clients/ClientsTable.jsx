@@ -622,7 +622,7 @@ const ClientsTable = () => {
 
             {/* Delete Confirmation Dialog */}
             {showDeleteConfirm && clientToDelete && (
-                <div className="fixed inset-0 bg-black bg-opacity-60 backdrop-blur-sm flex items-center justify-center z-50 transition-opacity duration-300">
+                <div className="fixed inset-0 bg-transparent bg-opacity-75 backdrop-blur-sm backdrop-brightness-50  flex items-center justify-center z-50 transition-opacity duration-300">
                     <div className="bg-white rounded-xl shadow-lg p-6 w-full max-w-md mx-auto">
                         <h3 className="text-lg font-bold mb-4 flex items-center text-red-600">
                             <AlertCircle className="mr-2" size={24} />
